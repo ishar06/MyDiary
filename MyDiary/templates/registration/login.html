@@ -19,8 +19,12 @@
         padding: 2rem;
         border-radius: 10px;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        width: 100%;
+        width: 90%;
+        max-width: 400px;
         color: #333;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 1s ease-out forwards;
     }
 
     [data-theme="dark"] .auth-box {
@@ -103,6 +107,17 @@
         }
     }
 
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .container-fluid {
         width: 100%;
         padding-right: 0;
@@ -125,7 +140,7 @@
                     <div class="welcome-line">Log in to reflect.</div>
                 </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-5 d-flex justify-content-center">
                 <div class="auth-box">
                     <h2 class="auth-title text-center">Welcome Back</h2>
                     <form method="post" class="needs-validation" novalidate>
