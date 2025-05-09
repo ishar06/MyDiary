@@ -4,13 +4,23 @@
 
 {% block content %}
 <style>
+    body {
+        background: url('/static/images/img8.jpg') no-repeat center center fixed;
+        background-size: cover;
+        min-height: 100vh;
+    }
+
     .form-container {
         max-width: 800px;
-        margin: 0 auto;
-        background: var(--background-color);
+        margin: 2rem auto;
+        background: rgba(255, 255, 255, 0.95);
         padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    [data-theme="dark"] .form-container {
+        background: rgba(33, 37, 41, 0.95);
     }
 
     .formatting-toolbar {

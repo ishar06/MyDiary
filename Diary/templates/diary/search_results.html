@@ -4,21 +4,35 @@
 
 {% block content %}
 <style>
+    body {
+        background: url('/static/images/img10.jpg') no-repeat center center fixed;
+        background-size: cover;
+        min-height: 100vh;
+    }
+
     .search-header {
         margin-bottom: 2rem;
-        padding: 1rem;
-        background: var(--background-color);
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    [data-theme="dark"] .search-header {
+        background: rgba(33, 37, 41, 0.95);
     }
 
     .entry-card {
-        background: var(--background-color);
-        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         transition: transform 0.2s;
+    }
+
+    [data-theme="dark"] .entry-card {
+        background: rgba(33, 37, 41, 0.95);
     }
 
     .entry-card:hover {
