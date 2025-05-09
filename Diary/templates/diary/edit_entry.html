@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Entry{% endblock %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: var(--background-color);
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .formatting-toolbar {
+        background: var(--background-color);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .formatting-toolbar .btn-group {
+        margin-right: 1rem;
+    }
+
+    .btn-format {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-format.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .mood-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .mood-option {
+        flex: 1;
+        min-width: 100px;
+        text-align: center;
+        padding: 0.5rem;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .mood-option:hover {
+        background-color: rgba(74, 144, 226, 0.1);
+    }
+
+    .mood-option.selected {
+        border-color: var(--primary-color);
+        background-color: rgba(74, 144, 226, 0.1);
+    }
+
+    .mood-emoji {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    #id_content {
+        min-height: 300px;
+        resize: vertical;
+    }
+
+    .entry-meta {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    [data-theme="dark"] .entry-meta {
+        color: #aaa;
+    }
+</style>
+
+<div class="form-container">
+    <h2 class="mb-3">Edit Entry</h2>
+    <div class="entry-meta">
+        Created: {{ entry.created_at|date:"F j, Y, g:i a" }}<br>
+        Last modified: {{ entry.updated_at|date:"F j, Y, g:i a" }}
+    </div>
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="id_title" class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" id="id_title" value="{{ entry.title }}" required>
+            {{ form.title.errors }}
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">How are you feeling?</label>
+            <div class="mood-selector">
+                {% for value, label in form.mood.field.choices %}
+                <div class="mood-option {% if entry.mood == value %}selected{% endif %}" 
+                     onclick="selectMood(this, '{{ value }}')" 
+                     data-mood="{{ value }}">
+                    <span class="mood-emoji">
+                        {% if value == 'happy' %}😊
+                        {% elif value == 'sad' %}😢
+                        {% elif value == 'angry' %}😠
+                        {% elif value == 'lonely' %}😔
+                        {% elif value == 'depressed' %}😞
+                        {% elif value == 'excited' %}😃
+                        {% elif value == 'peaceful' %}😌
+                        {% endif %}
+                    </span>
+                    <span>{{ label }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <input type="hidden" name="mood" id="id_mood" value="{{ entry.mood }}" required>
+            {{ form.mood.errors }}
+        </div>
+
+        <div class="formatting-toolbar">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary btn-format {% if entry.is_bold %}active{% endif %}" 
+                                data-format="bold" title="Bold">
+                            <i class="bi bi-type-bold"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-format {% if entry.is_italic %}active{% endif %}" 
+                                data-format="italic" title="Italic">
+                            <i class="bi bi-type-italic"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-format {% if entry.is_underline %}active{% endif %}" 
+                                data-format="underline" title="Underline">
+                            <i class="bi bi-type-underline"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-format {% if entry.is_strikethrough %}active{% endif %}" 
+                                data-format="strikethrough" title="Strikethrough">
+                            <i class="bi bi-type-strikethrough"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <select class="form-select" name="font_style" id="id_font_style">
+                        <option value="Arial" {% if entry.font_style == 'Arial' %}selected{% endif %}>Arial</option>
+                        <option value="Times New Roman" {% if entry.font_style == 'Times New Roman' %}selected{% endif %}>Times New Roman</option>
+                        <option value="Courier New" {% if entry.font_style == 'Courier New' %}selected{% endif %}>Courier New</option>
+                        <option value="Georgia" {% if entry.font_style == 'Georgia' %}selected{% endif %}>Georgia</option>
+                        <option value="Verdana" {% if entry.font_style == 'Verdana' %}selected{% endif %}>Verdana</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <select class="form-select" name="font_size" id="id_font_size">
+                        <option value="12" {% if entry.font_size == '12' %}selected{% endif %}>12px</option>
+                        <option value="14" {% if entry.font_size == '14' %}selected{% endif %}>14px</option>
+                        <option value="16" {% if entry.font_size == '16' %}selected{% endif %}>16px</option>
+                        <option value="18" {% if entry.font_size == '18' %}selected{% endif %}>18px</option>
+                        <option value="20" {% if entry.font_size == '20' %}selected{% endif %}>20px</option>
+                        <option value="24" {% if entry.font_size == '24' %}selected{% endif %}>24px</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="id_content" class="form-label">Content</label>
+            <textarea name="content" class="form-control" id="id_content" required>{{ entry.content }}</textarea>
+            {{ form.content.errors }}
+        </div>
+
+        <!-- Hidden formatting fields -->
+        <input type="hidden" name="is_bold" id="id_is_bold" value="{{ entry.is_bold|lower }}">
+        <input type="hidden" name="is_italic" id="id_is_italic" value="{{ entry.is_italic|lower }}">
+        <input type="hidden" name="is_underline" id="id_is_underline" value="{{ entry.is_underline|lower }}">
+        <input type="hidden" name="is_strikethrough" id="id_is_strikethrough" value="{{ entry.is_strikethrough|lower }}">
+
+        <div class="d-flex justify-content-between">
+            <div>
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary me-2">Cancel</a>
+                <button type="button" class="btn btn-outline-danger" 
+                        onclick="if(confirm('Are you sure you want to delete this entry?')) { 
+                            document.getElementById('delete-form').submit(); 
+                        }">
+                    Delete Entry
+                </button>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+
+    <form id="delete-form" action="{% url 'delete_entry' entry.pk %}" method="POST" style="display: none;">
+        {% csrf_token %}
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+    function selectMood(element, mood) {
+        // Remove selected class from all mood options
+        document.querySelectorAll('.mood-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        // Add selected class to clicked option
+        element.classList.add('selected');
+        // Set the hidden input value
+        document.getElementById('id_mood').value = mood;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const formatButtons = document.querySelectorAll('.btn-format');
+        const content = document.getElementById('id_content');
+        const fontStyle = document.getElementById('id_font_style');
+        const fontSize = document.getElementById('id_font_size');
+
+        // Initialize format buttons
+        formatButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const format = this.dataset.format;
+                this.classList.toggle('active');
+                document.getElementById(`id_is_${format}`).value = this.classList.contains('active');
+                updatePreview();
+            });
+        });
+
+        // Font style and size change handlers
+        [fontStyle, fontSize].forEach(select => {
+            select.addEventListener('change', updatePreview);
+        });
+
+        function updatePreview() {
+            const styles = {
+                'font-family': fontStyle.value,
+                'font-size': `${fontSize.value}px`
+            };
+
+            // Add format styles based on active buttons
+            formatButtons.forEach(button => {
+                const format = button.dataset.format;
+                if (button.classList.contains('active')) {
+                    switch(format) {
+                        case 'bold':
+                            styles['font-weight'] = 'bold';
+                            break;
+                        case 'italic':
+                            styles['font-style'] = 'italic';
+                            break;
+                        case 'underline':
+                            styles['text-decoration'] = 'underline';
+                            break;
+                        case 'strikethrough':
+                            styles['text-decoration'] = 'line-through';
+                            break;
+                    }
+                }
+            });
+
+            // Apply styles to content textarea
+            Object.assign(content.style, styles);
+        }
+
+        // Initial preview update
+        updatePreview();
+    });
+</script>
+{% endblock %}
+{% endblock %}
