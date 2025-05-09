@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyDiary - {% block title %}{% endblock %}</title>
+    <title>MyDiary - {% block title %}{% block title_text %}{% endblock %}{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
@@ -29,6 +29,23 @@
 
         .navbar {
             background-color: var(--primary-color) !important;
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
         }
 
         #theme-toggle {
@@ -41,49 +58,276 @@
         #theme-toggle:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
+
+        .main-content {
+            flex: 1;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3rem 0 1.5rem;
+            margin-top: 3rem;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .footer-section h5 {
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .social-links {
+            font-size: 1.5rem;
+        }
+
+        .social-links a {
+            margin-right: 1rem;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .settings-section {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 1.5rem 0;
+            margin-bottom: 1.5rem;
+        }
+
+        [data-theme="dark"] .settings-section {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .settings-title {
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .opacity-value {
+            font-size: 0.875rem;
+            color: var(--text-color);
+        }
     </style>
 </head>
 <body>
     {% if user.is_authenticated %}
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">MyDiary</a>
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="bi bi-journal-text"></i> MyDiary
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'new_entry' %}">New Entry</a>
+                        <a class="nav-link" href="{% url 'new_entry' %}">
+                            <i class="bi bi-plus-lg"></i> New Entry
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'search_entries' %}">
+                            <i class="bi bi-search"></i> Search
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-collection"></i> Categories
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="?category=personal">Personal</a></li>
+                            <li><a class="dropdown-item" href="?category=work">Work</a></li>
+                            <li><a class="dropdown-item" href="?category=travel">Travel</a></li>
+                            <li><a class="dropdown-item" href="?category=health">Health</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="?category=all">View All</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#statsModal">
+                            <i class="bi bi-graph-up"></i> Stats
+                        </a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
                     <div id="theme-toggle" class="text-white me-3">
                         <i class="bi bi-sun-fill"></i>
                     </div>
-                    <span class="text-white me-3">Welcome, {{ user.username }}</span>
-                    <form method="post" action="{% url 'logout' %}" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-outline-light">Logout</button>
-                    </form>
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i>
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal"><i class="bi bi-gear"></i> Settings</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
     {% endif %}
 
-    <div class="container-fluid p-0">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-        {% block content %}{% endblock %}
+    <div class="main-content">
+        <div class="container-fluid p-0">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
     </div>
 
+    {% if user.is_authenticated %}
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 footer-section">
+                    <h5>About MyDiary</h5>
+                    <p>A personal digital diary application that helps you capture your thoughts, memories, and experiences in a secure and organized way.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="bi bi-github"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                        <a href="#"><i class="bi bi-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 footer-section">
+                    <h5>Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'new_entry' %}">New Entry</a></li>
+                        <li><a href="{% url 'search_entries' %}">Search</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 footer-section">
+                    <h5>Contact Developer</h5>
+                    <ul class="footer-links">
+                        <li><i class="bi bi-envelope"></i> Email: developer@mydiary.com</li>
+                        <li><i class="bi bi-geo-alt"></i> Location: Silicon Valley, CA</li>
+                        <li><i class="bi bi-phone"></i> Phone: +1 (123) 456-7890</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; {% now "Y" %} MyDiary. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Stats Modal -->
+    <div class="modal fade" id="statsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Your Diary Stats</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Mood Distribution</h6>
+                            <canvas id="moodChart"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Entry Timeline</h6>
+                            <canvas id="timelineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-gear"></i> Settings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section">
+                        <h6 class="settings-title">Theme</h6>
+                        <div class="btn-group w-100">
+                            <button type="button" class="btn btn-outline-primary" id="theme-light">
+                                <i class="bi bi-sun-fill"></i> Light
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" id="theme-dark">
+                                <i class="bi bi-moon-fill"></i> Dark
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h6 class="settings-title">Content Background Opacity</h6>
+                        <p class="text-muted small mb-2">Adjust the transparency of content containers across all pages</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="form-range flex-grow-1" id="global-opacity-range" min="0" max="100" value="95">
+                            <span class="opacity-value" id="opacity-value">95%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const themeToggle = document.getElementById('theme-toggle');
         const icon = themeToggle.querySelector('i');
@@ -102,6 +346,72 @@
         // Set initial theme
         const savedTheme = localStorage.getItem('theme') || 'light';
         setTheme(savedTheme === 'dark');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme controls
+            const themeLight = document.getElementById('theme-light');
+            const themeDark = document.getElementById('theme-dark');
+            const opacityRange = document.getElementById('global-opacity-range');
+            const opacityValue = document.getElementById('opacity-value');
+
+            // Load saved settings
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const savedOpacity = localStorage.getItem('contentOpacity') || '95';
+
+            // Set initial theme
+            setTheme(savedTheme === 'dark');
+            updateThemeButtons(savedTheme === 'dark');
+
+            // Set initial opacity
+            opacityRange.value = savedOpacity;
+            opacityValue.textContent = savedOpacity + '%';
+            applyGlobalOpacity(savedOpacity);
+
+            // Theme button handlers
+            themeLight.addEventListener('click', () => {
+                setTheme(false);
+                updateThemeButtons(false);
+            });
+
+            themeDark.addEventListener('click', () => {
+                setTheme(true);
+                updateThemeButtons(true);
+            });
+
+            // Opacity control handler
+            opacityRange.addEventListener('input', function() {
+                opacityValue.textContent = this.value + '%';
+                applyGlobalOpacity(this.value);
+            });
+
+            function updateThemeButtons(isDark) {
+                themeLight.classList.toggle('active', !isDark);
+                themeDark.classList.toggle('active', isDark);
+            }
+
+            function applyGlobalOpacity(opacity) {
+                const containers = document.querySelectorAll('.form-container, .entry-card, .sidebar, .search-header, .no-results');
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const bgColor = isDark ? 
+                    `rgba(33, 37, 41, ${opacity/100})` : 
+                    `rgba(255, 255, 255, ${opacity/100})`;
+                
+                containers.forEach(container => {
+                    container.style.backgroundColor = bgColor;
+                });
+            }
+
+            // Save settings function
+            window.saveSettings = function() {
+                const opacity = opacityRange.value;
+                localStorage.setItem('contentOpacity', opacity);
+                localStorage.setItem('theme', document.documentElement.getAttribute('data-theme'));
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
+                modal.hide();
+            };
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>

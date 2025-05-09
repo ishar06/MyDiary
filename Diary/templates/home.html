@@ -26,6 +26,7 @@
         height: fit-content;
         position: sticky;
         top: 2rem;
+        transition: background-color 0.3s;
     }
 
     [data-theme="dark"] .sidebar {
@@ -42,7 +43,7 @@
         padding: 1.5rem;
         margin-bottom: 1.5rem;
         box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        transition: transform 0.2s;
+        transition: all 0.3s;
     }
 
     [data-theme="dark"] .entry-card {
@@ -224,4 +225,21 @@
         {% endif %}
     </main>
 </div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.querySelector('.sidebar');
+        const entryCards = document.querySelectorAll('.entry-card');
+
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const bgColor = isDark ? `rgba(33, 37, 41, 0.95)` : `rgba(255, 255, 255, 0.95)`;
+        
+        sidebar.style.backgroundColor = bgColor;
+        entryCards.forEach(card => {
+            card.style.backgroundColor = bgColor;
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %}

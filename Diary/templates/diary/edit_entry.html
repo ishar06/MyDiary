@@ -17,44 +17,23 @@
         padding: 2rem;
         border-radius: 15px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        transition: background-color 0.3s;
     }
 
     [data-theme="dark"] .form-container {
         background: rgba(33, 37, 41, 0.95);
     }
 
-    .formatting-toolbar {
-        background: var(--background-color);
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .formatting-toolbar .btn-group {
-        margin-right: 1rem;
-    }
-
-    .btn-format {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.875rem;
-    }
-
-    .btn-format.active {
-        background-color: var(--primary-color);
-        color: white;
-    }
-
-    .mood-selector {
-        display: flex;
-        flex-wrap: wrap;
+    .emoji-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
         gap: 0.5rem;
+        max-height: 200px;
+        overflow-y: auto;
         margin-bottom: 1rem;
     }
 
-    .mood-option {
-        flex: 1;
-        min-width: 100px;
+    .emoji-option {
         text-align: center;
         padding: 0.5rem;
         border: 2px solid transparent;
@@ -63,34 +42,43 @@
         transition: all 0.2s;
     }
 
-    .mood-option:hover {
+    .emoji-option:hover {
         background-color: rgba(74, 144, 226, 0.1);
     }
 
-    .mood-option.selected {
+    .emoji-option.selected {
         border-color: var(--primary-color);
         background-color: rgba(74, 144, 226, 0.1);
     }
 
     .mood-emoji {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
         display: block;
     }
 
-    #id_content {
-        min-height: 300px;
-        resize: vertical;
+    .mood-label {
+        font-size: 0.75rem;
     }
 
-    .entry-meta {
-        font-size: 0.9rem;
-        color: #666;
+    .advanced-toolbar {
+        background: var(--background-color);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .toolbar-section {
         margin-bottom: 1rem;
     }
 
-    [data-theme="dark"] .entry-meta {
-        color: #aaa;
+    .color-picker {
+        width: 100%;
+        height: 40px;
+        padding: 0;
+        border: none;
+        border-radius: 5px;
     }
 </style>
 
@@ -112,33 +100,77 @@
 
         <div class="mb-4">
             <label class="form-label">How are you feeling?</label>
-            <div class="mood-selector">
-                {% for value, label in form.mood.field.choices %}
-                <div class="mood-option {% if entry.mood == value %}selected{% endif %}" 
-                     onclick="selectMood(this, '{{ value }}')" 
-                     data-mood="{{ value }}">
-                    <span class="mood-emoji">
-                        {% if value == 'happy' %}😊
-                        {% elif value == 'sad' %}😢
-                        {% elif value == 'angry' %}😠
-                        {% elif value == 'lonely' %}😔
-                        {% elif value == 'depressed' %}😞
-                        {% elif value == 'excited' %}😃
-                        {% elif value == 'peaceful' %}😌
-                        {% endif %}
-                    </span>
-                    <span>{{ label }}</span>
+            <div class="emoji-grid">
+                <div class="emoji-option {% if entry.mood == 'happy' %}selected{% endif %}" data-mood="happy">
+                    <span class="mood-emoji">😊</span>
+                    <span class="mood-label">Happy</span>
                 </div>
-                {% endfor %}
+                <div class="emoji-option {% if entry.mood == 'sad' %}selected{% endif %}" data-mood="sad">
+                    <span class="mood-emoji">😢</span>
+                    <span class="mood-label">Sad</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'angry' %}selected{% endif %}" data-mood="angry">
+                    <span class="mood-emoji">😠</span>
+                    <span class="mood-label">Angry</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'lonely' %}selected{% endif %}" data-mood="lonely">
+                    <span class="mood-emoji">😔</span>
+                    <span class="mood-label">Lonely</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'depressed' %}selected{% endif %}" data-mood="depressed">
+                    <span class="mood-emoji">😞</span>
+                    <span class="mood-label">Depressed</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'excited' %}selected{% endif %}" data-mood="excited">
+                    <span class="mood-emoji">😃</span>
+                    <span class="mood-label">Excited</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'peaceful' %}selected{% endif %}" data-mood="peaceful">
+                    <span class="mood-emoji">😌</span>
+                    <span class="mood-label">Peaceful</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'anxious' %}selected{% endif %}" data-mood="anxious">
+                    <span class="mood-emoji">😰</span>
+                    <span class="mood-label">Anxious</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'grateful' %}selected{% endif %}" data-mood="grateful">
+                    <span class="mood-emoji">🙏</span>
+                    <span class="mood-label">Grateful</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'tired' %}selected{% endif %}" data-mood="tired">
+                    <span class="mood-emoji">😴</span>
+                    <span class="mood-label">Tired</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'loved' %}selected{% endif %}" data-mood="loved">
+                    <span class="mood-emoji">🥰</span>
+                    <span class="mood-label">Loved</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'proud' %}selected{% endif %}" data-mood="proud">
+                    <span class="mood-emoji">😎</span>
+                    <span class="mood-label">Proud</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'confused' %}selected{% endif %}" data-mood="confused">
+                    <span class="mood-emoji">😕</span>
+                    <span class="mood-label">Confused</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'hopeful' %}selected{% endif %}" data-mood="hopeful">
+                    <span class="mood-emoji">🌟</span>
+                    <span class="mood-label">Hopeful</span>
+                </div>
+                <div class="emoji-option {% if entry.mood == 'motivated' %}selected{% endif %}" data-mood="motivated">
+                    <span class="mood-emoji">💪</span>
+                    <span class="mood-label">Motivated</span>
+                </div>
             </div>
             <input type="hidden" name="mood" id="id_mood" value="{{ entry.mood }}" required>
             {{ form.mood.errors }}
         </div>
 
-        <div class="formatting-toolbar">
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <div class="btn-group">
+        <div class="advanced-toolbar mb-4">
+            <div class="row">
+                <div class="col-md-6 toolbar-section">
+                    <label class="form-label">Text Formatting</label>
+                    <div class="btn-group w-100">
                         <button type="button" class="btn btn-outline-secondary btn-format {% if entry.is_bold %}active{% endif %}" 
                                 data-format="bold" title="Bold">
                             <i class="bi bi-type-bold"></i>
@@ -155,18 +187,49 @@
                                 data-format="strikethrough" title="Strikethrough">
                             <i class="bi bi-type-strikethrough"></i>
                         </button>
+                        <button type="button" class="btn btn-outline-secondary btn-format" data-format="subscript" title="Subscript">
+                            <i class="bi bi-subscript"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-format" data-format="superscript" title="Superscript">
+                            <i class="bi bi-superscript"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="col-auto">
+                <div class="col-md-6 toolbar-section">
+                    <label class="form-label">Text Alignment</label>
+                    <div class="btn-group w-100">
+                        <button type="button" class="btn btn-outline-secondary btn-align active" data-align="left">
+                            <i class="bi bi-text-left"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-align" data-align="center">
+                            <i class="bi bi-text-center"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-align" data-align="right">
+                            <i class="bi bi-text-right"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-align" data-align="justify">
+                            <i class="bi bi-justify"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-4 toolbar-section">
+                    <label for="id_font_style" class="form-label">Font Style</label>
                     <select class="form-select" name="font_style" id="id_font_style">
                         <option value="Arial" {% if entry.font_style == 'Arial' %}selected{% endif %}>Arial</option>
                         <option value="Times New Roman" {% if entry.font_style == 'Times New Roman' %}selected{% endif %}>Times New Roman</option>
                         <option value="Courier New" {% if entry.font_style == 'Courier New' %}selected{% endif %}>Courier New</option>
                         <option value="Georgia" {% if entry.font_style == 'Georgia' %}selected{% endif %}>Georgia</option>
                         <option value="Verdana" {% if entry.font_style == 'Verdana' %}selected{% endif %}>Verdana</option>
+                        <option value="Helvetica" {% if entry.font_style == 'Helvetica' %}selected{% endif %}>Helvetica</option>
+                        <option value="Palatino" {% if entry.font_style == 'Palatino' %}selected{% endif %}>Palatino</option>
+                        <option value="Garamond" {% if entry.font_style == 'Garamond' %}selected{% endif %}>Garamond</option>
                     </select>
                 </div>
-                <div class="col-auto">
+                <div class="col-md-4 toolbar-section">
+                    <label for="id_font_size" class="form-label">Font Size</label>
                     <select class="form-select" name="font_size" id="id_font_size">
                         <option value="12" {% if entry.font_size == '12' %}selected{% endif %}>12px</option>
                         <option value="14" {% if entry.font_size == '14' %}selected{% endif %}>14px</option>
@@ -174,7 +237,26 @@
                         <option value="18" {% if entry.font_size == '18' %}selected{% endif %}>18px</option>
                         <option value="20" {% if entry.font_size == '20' %}selected{% endif %}>20px</option>
                         <option value="24" {% if entry.font_size == '24' %}selected{% endif %}>24px</option>
+                        <option value="28" {% if entry.font_size == '28' %}selected{% endif %}>28px</option>
+                        <option value="32" {% if entry.font_size == '32' %}selected{% endif %}>32px</option>
                     </select>
+                </div>
+                <div class="col-md-4 toolbar-section">
+                    <label for="text-color" class="form-label">Text Color</label>
+                    <input type="color" class="color-picker form-control" id="text-color" value="#000000">
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label class="form-label">Quick Formatting</label>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('header')">Add Header</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('list')">Add List</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('quote')">Add Quote</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('table')">Add Table</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('code')">Add Code Block</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -190,6 +272,8 @@
         <input type="hidden" name="is_italic" id="id_is_italic" value="{{ entry.is_italic|lower }}">
         <input type="hidden" name="is_underline" id="id_is_underline" value="{{ entry.is_underline|lower }}">
         <input type="hidden" name="is_strikethrough" id="id_is_strikethrough" value="{{ entry.is_strikethrough|lower }}">
+        <input type="hidden" name="text_align" id="id_text_align" value="left">
+        <input type="hidden" name="text_color" id="id_text_color" value="#000000">
 
         <div class="d-flex justify-content-between">
             <div>
@@ -212,24 +296,25 @@
 
 {% block extra_js %}
 <script>
+    // Existing mood selection code
     function selectMood(element, mood) {
-        // Remove selected class from all mood options
-        document.querySelectorAll('.mood-option').forEach(option => {
+        document.querySelectorAll('.emoji-option').forEach(option => {
             option.classList.remove('selected');
         });
-        // Add selected class to clicked option
         element.classList.add('selected');
-        // Set the hidden input value
         document.getElementById('id_mood').value = mood;
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        // Formatting controls
         const formatButtons = document.querySelectorAll('.btn-format');
+        const alignButtons = document.querySelectorAll('.btn-align');
         const content = document.getElementById('id_content');
         const fontStyle = document.getElementById('id_font_style');
         const fontSize = document.getElementById('id_font_size');
+        const textColor = document.getElementById('text-color');
 
-        // Initialize format buttons
+        // Format buttons
         formatButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const format = this.dataset.format;
@@ -237,6 +322,22 @@
                 document.getElementById(`id_is_${format}`).value = this.classList.contains('active');
                 updatePreview();
             });
+        });
+
+        // Alignment buttons
+        alignButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                alignButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('id_text_align').value = this.dataset.align;
+                updatePreview();
+            });
+        });
+
+        // Text color
+        textColor.addEventListener('change', function() {
+            document.getElementById('id_text_color').value = this.value;
+            updatePreview();
         });
 
         // Font style and size change handlers
@@ -247,7 +348,9 @@
         function updatePreview() {
             const styles = {
                 'font-family': fontStyle.value,
-                'font-size': `${fontSize.value}px`
+                'font-size': `${fontSize.value}px`,
+                'color': textColor.value,
+                'text-align': document.getElementById('id_text_align').value
             };
 
             // Add format styles based on active buttons
@@ -267,6 +370,14 @@
                         case 'strikethrough':
                             styles['text-decoration'] = 'line-through';
                             break;
+                        case 'subscript':
+                            styles['vertical-align'] = 'sub';
+                            styles['font-size'] = 'smaller';
+                            break;
+                        case 'superscript':
+                            styles['vertical-align'] = 'super';
+                            styles['font-size'] = 'smaller';
+                            break;
                     }
                 }
             });
@@ -278,6 +389,27 @@
         // Initial preview update
         updatePreview();
     });
+
+    // Template insertion functions
+    function insertTemplate(type) {
+        const textarea = document.getElementById('id_content');
+        const templates = {
+            header: '# Your Header Here\n\n',
+            list: '• Item 1\n• Item 2\n• Item 3\n\n',
+            quote: '> Your quote here\n\n',
+            table: '| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |\n\n',
+            code: '```\nYour code here\n```\n\n'
+        };
+        
+        const cursorPos = textarea.selectionStart;
+        const textBefore = textarea.value.substring(0, cursorPos);
+        const textAfter = textarea.value.substring(textarea.selectionEnd);
+        
+        textarea.value = textBefore + templates[type] + textAfter;
+        textarea.focus();
+        textarea.selectionStart = cursorPos + templates[type].length;
+        textarea.selectionEnd = textarea.selectionStart;
+    }
 </script>
 {% endblock %}
 {% endblock %}
