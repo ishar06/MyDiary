@@ -26,14 +26,25 @@
 
 ---
 
-## 🧑‍💻 About the Developer
+## PROJECT STRUCTURE
 
-Hi! I'm **Ishardeep Singh**, a computer science undergraduate at Chitkara University, specializing in AI. I'm passionate about building meaningful digital experiences, and I love blending creativity with code.
-
-- 🧠 Interests: Web Development, AI, Problem-Solving, UI Design, Anime, Sports
-- 📫 Email: singhishardeep06@gmail.com
-- 🔗 LinkedIn: [https://www.linkedin.com/in/ishardeep-singh](https://www.linkedin.com/in/ishardeep-singh)
-
+```
+MyDiary/
+│
+├── MyDiary/                  # Django project root
+│   ├── CoreApp/              # Core application logic
+│   ├── Diary/                # Diary-related views and models
+│   ├── templates/            # HTML templates
+│   ├── static/               # Static files (CSS, JS, images)
+│   ├── staticfiles/          # Collected static files (via collectstatic)
+│   ├── manage.py             # Django management script
+│   ├── settings.py           # Project settings
+│   └── urls.py               # URL routing
+│
+├── requirements.txt          # Project dependencies
+├── README.md                 # Documentation and setup instructions
+└── LICENSE                   # MIT License
+```
 
 ---
 
@@ -51,7 +62,9 @@ Hi! I'm **Ishardeep Singh**, a computer science undergraduate at Chitkara Univer
 ### ✅ Step 3: Clone the Project or Download ZIP
 
 ```bash
-git clone https://github.com/ishar06/MyDiary.git
+git clone https://github.com/ishar06/MyDiary
+```
+```bash
 cd MyDiary
 ```
 
@@ -60,10 +73,14 @@ Or download the ZIP and extract it.
 ### ✅ Step 4: Set Up Virtual Environment
 
 ```bash
-python -m venv venv
-# Windows
+python -m venv env
+```
+-- Windows
+```bash
 venv\Scripts\activate
-# Mac/Linux
+```
+-- Mac/Linux
+```bash
 source venv/bin/activate
 ```
 
@@ -79,7 +96,15 @@ If `requirements.txt` doesn't exist yet, install manually:
 pip install asgiref Django django-jazzmin sqlparse
 ```
 
+```bash
+cd MyDiary
+```
+
 ### ✅ Step 6: Set Up the Database
+
+```bash
+python manage.py makemigrations
+```
 
 ```bash
 python manage.py migrate
@@ -98,6 +123,28 @@ Go to `http://127.0.0.1:8000` in your browser.
 ```bash
 python manage.py createsuperuser
 ```
+
+---
+
+## 👨‍💻 About the Developer
+
+Hi! I'm **Ishardeep Singh**, a computer science undergraduate at Chitkara University, specializing in AI. I'm passionate about building meaningful digital experiences, and I love blending creativity with code.
+
+**Skills:**  
+- Programming Languages: Python, C, C++, JavaScript  
+- Technologies & Frameworks: OpenCV, MediaPipe, Flask, Django, React (beginner)  
+- Areas of Interest: Computer Vision, AI/ML, Full-Stack Web Development, Game Development  
+- Soft Skills: Public Speaking, Team Leadership, Project Management, Problem Solving
+
+
+### 📫 Contact & Links
+
+- 📧 Email: [singhishardeep06@gmail.com](mailto:singhishardeep06@gmail.com)
+- 💼 LinkedIn: [linkedin.com/in/ishardeep-singh-743789311](https://www.linkedin.com/in/ishardeep-singh-743789311)
+- 🌍 GitHub: [github.com/ishar06](https://github.com/ishar06)
+
+
+> 🔍 I am actively seeking opportunities to contribute to exciting projects, internships, and roles that align with my passion for technology and innovation. Let's connect!
 
 ---
 
@@ -125,7 +172,7 @@ This project is licensed under the **MIT License**.
 
 You are free to use, modify, and distribute this software for personal or commercial purposes, as long as the original license and copyright notice are included.
 
-> For full license details, refer to the [LICENSE](LICENSE) file in the repository.
+> For full license details, refer to the [LICENSE](https://github.com/ishar06/MyDiary/blob/main/LICENSE) file in the repository.
 
 ---
 
