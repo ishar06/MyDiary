@@ -77,11 +77,11 @@ python -m venv env
 ```
 -- Windows
 ```bash
-venv\Scripts\activate
+env\Scripts\activate
 ```
 -- Mac/Linux
 ```bash
-source venv/bin/activate
+source env/bin/activate
 ```
 
 ### ✅ Step 5: Install Dependencies
