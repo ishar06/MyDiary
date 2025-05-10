@@ -11,11 +11,15 @@
             --primary-color: #4a90e2;
             --background-color: #ffffff;
             --text-color: #333333;
+            --modal-bg: rgba(255, 255, 255, 0.95);
+            --border-color: rgba(0, 0, 0, 0.1);
         }
 
         [data-theme="dark"] {
             --background-color: #1a1a1a;
             --text-color: #ffffff;
+            --modal-bg: rgba(33, 37, 41, 0.95);
+            --border-color: rgba(255, 255, 255, 0.1);
         }
 
         body {
@@ -114,13 +118,13 @@
         }
 
         .settings-section {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid var(--border-color);
             padding: 1.5rem 0;
             margin-bottom: 1.5rem;
         }
 
         [data-theme="dark"] .settings-section {
-            border-bottom-color: rgba(255, 255, 255, 0.1);
+            border-bottom-color: var(--border-color);
         }
 
         .settings-section:last-child {
@@ -131,11 +135,18 @@
         .settings-title {
             font-weight: 500;
             margin-bottom: 1rem;
+            color: var(--text-color);
         }
 
         .opacity-value {
             font-size: 0.875rem;
             color: var(--text-color);
+        }
+
+        .modal-content {
+            background-color: var(--modal-bg);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
     </style>
 </head>
@@ -249,7 +260,7 @@
                 <div class="col-md-4 footer-section">
                     <h5>Contact Developer</h5>
                     <ul class="footer-links">
-                        <li><i class="bi bi-envelope"></i> Email: singhishardeep06</li>
+                        <li><i class="bi bi-envelope"></i> Email: singhishardeep06@gmail.com</li>
                         <li><i class="bi bi-geo-alt"></i> Location: Punjab, India</li>
                     </ul>
                 </div>
@@ -309,7 +320,7 @@
 
                     <div class="settings-section">
                         <h6 class="settings-title">Content Background Opacity</h6>
-                        <p class="text-muted small mb-2">Adjust the transparency of content containers across all pages</p>
+                        <p class="settings-title small mb-2">Adjust the transparency of content containers across all pages</p>
                         <div class="d-flex align-items-center gap-2">
                             <input type="range" class="form-range flex-grow-1" id="global-opacity-range" min="0" max="100" value="95">
                             <span class="opacity-value" id="opacity-value">95%</span>

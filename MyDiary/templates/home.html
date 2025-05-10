@@ -26,7 +26,7 @@
         height: fit-content;
         position: sticky;
         top: 2rem;
-        transition: background-color 0.3s;
+        transition: all 0.3s ease;
     }
 
     [data-theme="dark"] .sidebar {
@@ -229,15 +229,37 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.querySelector('.sidebar');
-        const entryCards = document.querySelectorAll('.entry-card');
+        function applyThemeStyles() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const opacity = localStorage.getItem('contentOpacity') || '95';
+            const sidebar = document.querySelector('.sidebar');
+            const entryCards = document.querySelectorAll('.entry-card');
+            
+            const bgColor = isDark ? 
+                `rgba(33, 37, 41, ${opacity/100})` : 
+                `rgba(255, 255, 255, ${opacity/100})`;
+            
+            if (sidebar) sidebar.style.backgroundColor = bgColor;
+            entryCards.forEach(card => {
+                card.style.backgroundColor = bgColor;
+            });
+        }
 
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const bgColor = isDark ? `rgba(33, 37, 41, 0.95)` : `rgba(255, 255, 255, 0.95)`;
-        
-        sidebar.style.backgroundColor = bgColor;
-        entryCards.forEach(card => {
-            card.style.backgroundColor = bgColor;
+        // Apply theme styles initially
+        applyThemeStyles();
+
+        // Watch for theme changes
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'data-theme') {
+                    applyThemeStyles();
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
         });
     });
 </script>
