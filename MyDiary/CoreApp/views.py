@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import login
 from django.db.models import Q
-from .models import DiaryEntry
-from .forms import CustomUserCreationForm, DiaryEntryForm
+from .models import DiaryEntry, UserProfile
+from .forms import CustomUserCreationForm, DiaryEntryForm, UserProfileForm
 
 def register(request):
     if request.method == 'POST':
@@ -93,3 +93,23 @@ def search_entries(request):
         'current_mood': mood_filter
     }
     return render(request, 'diary/search_results.html', context)
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=request.user.userprofile)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            # Update User model fields
+            request.user.first_name = form.cleaned_data['first_name']
+            request.user.last_name = form.cleaned_data['last_name']
+            request.user.email = form.cleaned_data['email']
+            request.user.save()
+            
+            profile.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=request.user.userprofile)
+    
+    return render(request, 'profile.html', {'form': form})
