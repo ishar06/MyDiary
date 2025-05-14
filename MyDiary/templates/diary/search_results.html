@@ -202,13 +202,7 @@
                 <span class="entry-date">{{ entry.created_at|date:"F j, Y" }}</span>
             </div>
 
-            <div class="entry-content" 
-                 style="font-size: {{ entry.font_size }}px; 
-                        font-family: {{ entry.font_style }};
-                        {% if entry.is_bold %}font-weight: bold;{% endif %}
-                        {% if entry.is_italic %}font-style: italic;{% endif %}
-                        {% if entry.is_underline %}text-decoration: underline;{% endif %}
-                        {% if entry.is_strikethrough %}text-decoration: line-through;{% endif %}">
+            <div class="entry-content">
                 {{ entry.content|linebreaks }}
             </div>
 

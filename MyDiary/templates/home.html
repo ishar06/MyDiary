@@ -129,6 +129,12 @@
         background-color: var(--primary-color);
         color: white;
     }
+
+    .entry-content {
+        font-size: var(--entry-font-size);
+        font-family: var(--entry-font-style);
+        color: var(--entry-text-color);
+    }
 </style>
 
 <div class="diary-container">
@@ -191,7 +197,7 @@
                     <span class="entry-date">{{ entry.created_at|date:"F j, Y" }}</span>
                 </div>
 
-                <div class="entry-content" style="font-size: {{ entry.font_size }}px; font-family: '{{ entry.font_style }}'; color: {{ entry.text_color }}">
+                <div class="entry-content">
                     {{ entry.content|linebreaks }}
                 </div>
 
