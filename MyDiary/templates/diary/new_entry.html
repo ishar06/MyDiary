@@ -24,103 +24,6 @@
         background: rgba(33, 37, 41, 0.95);
     }
 
-    .formatting-toolbar {
-        background: var(--background-color);
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .formatting-toolbar .btn-group {
-        margin-right: 1rem;
-    }
-
-    .btn-format {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.875rem;
-    }
-
-    .btn-format.active {
-        background-color: var(--primary-color);
-        color: white;
-    }
-
-    .mood-selector {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .mood-option {
-        flex: 1;
-        min-width: 100px;
-        text-align: center;
-        padding: 0.5rem;
-        border: 2px solid transparent;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .mood-option:hover {
-        background-color: rgba(74, 144, 226, 0.1);
-    }
-
-    .mood-option.selected {
-        border-color: var(--primary-color);
-        background-color: rgba(74, 144, 226, 0.1);
-    }
-
-    .mood-emoji {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
-        display: block;
-    }
-
-    #id_content {
-        min-height: 300px;
-        resize: vertical;
-    }
-
-    .emoji-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-        gap: 0.5rem;
-        max-height: 200px;
-        overflow-y: auto;
-        margin-bottom: 1rem;
-    }
-
-    .emoji-option {
-        text-align: center;
-        padding: 0.5rem;
-        border: 2px solid transparent;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .emoji-option:hover {
-        background-color: rgba(74, 144, 226, 0.1);
-    }
-
-    .emoji-option.selected {
-        border-color: var(--primary-color);
-        background-color: rgba(74, 144, 226, 0.1);
-    }
-
-    .mood-emoji {
-        font-size: 1.5rem;
-        margin-bottom: 0.25rem;
-        display: block;
-    }
-
-    .mood-label {
-        font-size: 0.75rem;
-    }
-
     .advanced-toolbar {
         background: var(--background-color);
         padding: 1rem;
@@ -140,6 +43,60 @@
         border: none;
         border-radius: 5px;
     }
+
+    .emoji-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.5rem;
+        max-height: 200px;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+    }
+
+    .emoji-option {
+        text-align: center;
+        padding: 0.5rem;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .emoji-option:hover {
+        background-color: rgba(74, 144, 226, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .emoji-option:active {
+        transform: translateY(0);
+    }
+
+    .emoji-option.selected {
+        border-color: var(--primary-color);
+        background-color: rgba(74, 144, 226, 0.1);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .mood-emoji {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+        display: block;
+        cursor: pointer;
+        pointer-events: none; /* Make the emoji click go through to parent */
+    }
+
+    .mood-label {
+        font-size: 0.8rem;
+        pointer-events: none; /* Make the label click go through to parent */
+    }
+
+    #id_content {
+        min-height: 842px;  /* Height of A4 paper */
+        height: 60vh;  /* 60% of viewport height */
+        resize: vertical;
+    }
 </style>
 
 <div class="form-container">
@@ -156,66 +113,21 @@
         <div class="mb-4">
             <label class="form-label">How are you feeling?</label>
             <div class="emoji-grid">
-                <div class="emoji-option" data-mood="happy">
-                    <span class="mood-emoji">😊</span>
-                    <span class="mood-label">Happy</span>
+                {% for mood, label in form.fields.mood.choices %}
+                <div class="emoji-option" data-mood="{{ mood }}">
+                    <span class="mood-emoji">
+                        {% if mood == 'happy' %}😊
+                        {% elif mood == 'sad' %}😢
+                        {% elif mood == 'angry' %}😠
+                        {% elif mood == 'lonely' %}😔
+                        {% elif mood == 'depressed' %}😞
+                        {% elif mood == 'excited' %}😃
+                        {% elif mood == 'peaceful' %}😌
+                        {% endif %}
+                    </span>
+                    <span class="mood-label">{{ label }}</span>
                 </div>
-                <div class="emoji-option" data-mood="sad">
-                    <span class="mood-emoji">😢</span>
-                    <span class="mood-label">Sad</span>
-                </div>
-                <div class="emoji-option" data-mood="angry">
-                    <span class="mood-emoji">😠</span>
-                    <span class="mood-label">Angry</span>
-                </div>
-                <div class="emoji-option" data-mood="lonely">
-                    <span class="mood-emoji">😔</span>
-                    <span class="mood-label">Lonely</span>
-                </div>
-                <div class="emoji-option" data-mood="depressed">
-                    <span class="mood-emoji">😞</span>
-                    <span class="mood-label">Depressed</span>
-                </div>
-                <div class="emoji-option" data-mood="excited">
-                    <span class="mood-emoji">😃</span>
-                    <span class="mood-label">Excited</span>
-                </div>
-                <div class="emoji-option" data-mood="peaceful">
-                    <span class="mood-emoji">😌</span>
-                    <span class="mood-label">Peaceful</span>
-                </div>
-                <div class="emoji-option" data-mood="anxious">
-                    <span class="mood-emoji">😰</span>
-                    <span class="mood-label">Anxious</span>
-                </div>
-                <div class="emoji-option" data-mood="grateful">
-                    <span class="mood-emoji">🙏</span>
-                    <span class="mood-label">Grateful</span>
-                </div>
-                <div class="emoji-option" data-mood="tired">
-                    <span class="mood-emoji">😴</span>
-                    <span class="mood-label">Tired</span>
-                </div>
-                <div class="emoji-option" data-mood="loved">
-                    <span class="mood-emoji">🥰</span>
-                    <span class="mood-label">Loved</span>
-                </div>
-                <div class="emoji-option" data-mood="proud">
-                    <span class="mood-emoji">😎</span>
-                    <span class="mood-label">Proud</span>
-                </div>
-                <div class="emoji-option" data-mood="confused">
-                    <span class="mood-emoji">😕</span>
-                    <span class="mood-label">Confused</span>
-                </div>
-                <div class="emoji-option" data-mood="hopeful">
-                    <span class="mood-emoji">🌟</span>
-                    <span class="mood-label">Hopeful</span>
-                </div>
-                <div class="emoji-option" data-mood="motivated">
-                    <span class="mood-emoji">💪</span>
-                    <span class="mood-label">Motivated</span>
-                </div>
+                {% endfor %}
             </div>
             <input type="hidden" name="mood" id="id_mood" required>
             {{ form.mood.errors }}
@@ -223,91 +135,25 @@
 
         <div class="advanced-toolbar mb-4">
             <div class="row">
-                <div class="col-md-6 toolbar-section">
-                    <label class="form-label">Text Formatting</label>
-                    <div class="btn-group w-100">
-                        <button type="button" class="btn btn-outline-secondary btn-format" data-format="bold" title="Bold">
-                            <i class="bi bi-type-bold"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-format" data-format="italic" title="Italic">
-                            <i class="bi bi-type-italic"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-format" data-format="underline" title="Underline">
-                            <i class="bi bi-type-underline"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-format" data-format="strikethrough" title="Strikethrough">
-                            <i class="bi bi-type-strikethrough"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-format" data-format="subscript" title="Subscript">
-                            <i class="bi bi-subscript"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-format" data-format="superscript" title="Superscript">
-                            <i class="bi bi-superscript"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="col-md-6 toolbar-section">
-                    <label class="form-label">Text Alignment</label>
-                    <div class="btn-group w-100">
-                        <button type="button" class="btn btn-outline-secondary btn-align active" data-align="left">
-                            <i class="bi bi-text-left"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-align" data-align="center">
-                            <i class="bi bi-text-center"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-align" data-align="right">
-                            <i class="bi bi-text-right"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-align" data-align="justify">
-                            <i class="bi bi-justify"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row mt-3">
                 <div class="col-md-4 toolbar-section">
                     <label for="id_font_style" class="form-label">Font Style</label>
                     <select class="form-select" name="font_style" id="id_font_style">
-                        <option value="Arial">Arial</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Courier New">Courier New</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Palatino">Palatino</option>
-                        <option value="Garamond">Garamond</option>
+                        {% for value, label in form.fields.font_style.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-4 toolbar-section">
                     <label for="id_font_size" class="form-label">Font Size</label>
                     <select class="form-select" name="font_size" id="id_font_size">
-                        <option value="12">12px</option>
-                        <option value="14">14px</option>
-                        <option value="16" selected>16px</option>
-                        <option value="18">18px</option>
-                        <option value="20">20px</option>
-                        <option value="24">24px</option>
-                        <option value="28">28px</option>
-                        <option value="32">32px</option>
+                        {% for value, label in form.fields.font_size.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-4 toolbar-section">
                     <label for="text-color" class="form-label">Text Color</label>
                     <input type="color" class="color-picker form-control" id="text-color" value="#000000">
-                </div>
-            </div>
-
-            <div class="row mt-3">
-                <div class="col-12">
-                    <label class="form-label">Quick Formatting</label>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('header')">Add Header</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('list')">Add List</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('quote')">Add Quote</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('table')">Add Table</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('code')">Add Code Block</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -318,12 +164,6 @@
             {{ form.content.errors }}
         </div>
 
-        <!-- Hidden formatting fields -->
-        <input type="hidden" name="is_bold" id="id_is_bold" value="false">
-        <input type="hidden" name="is_italic" id="id_is_italic" value="false">
-        <input type="hidden" name="is_underline" id="id_is_underline" value="false">
-        <input type="hidden" name="is_strikethrough" id="id_is_strikethrough" value="false">
-        <input type="hidden" name="text_align" id="id_text_align" value="left">
         <input type="hidden" name="text_color" id="id_text_color" value="#000000">
 
         <div class="d-flex justify-content-between">
@@ -344,36 +184,29 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const formatButtons = document.querySelectorAll('.btn-format');
-        const alignButtons = document.querySelectorAll('.btn-align');
         const content = document.getElementById('id_content');
         const fontStyle = document.getElementById('id_font_style');
         const fontSize = document.getElementById('id_font_size');
         const textColor = document.getElementById('text-color');
         const emojiOptions = document.querySelectorAll('.emoji-option');
 
+        // Add click handler to both the emoji container and the emoji itself
         emojiOptions.forEach(option => {
-            option.addEventListener('click', function() {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Emoji clicked:', this.dataset.mood);
                 selectMood(this, this.dataset.mood);
             });
-        });
-
-        formatButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const format = this.dataset.format;
-                this.classList.toggle('active');
-                document.getElementById(`id_is_${format}`).value = this.classList.contains('active');
-                updatePreview();
-            });
-        });
-
-        alignButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                alignButtons.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById('id_text_align').value = this.dataset.align;
-                updatePreview();
-            });
+            
+            const emoji = option.querySelector('.mood-emoji');
+            if (emoji) {
+                emoji.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Emoji span clicked:', this.parentElement.dataset.mood);
+                    selectMood(this.parentElement, this.parentElement.dataset.mood);
+                });
+            }
         });
 
         textColor.addEventListener('change', function() {
@@ -389,60 +222,11 @@
             const styles = {
                 'font-family': fontStyle.value,
                 'font-size': `${fontSize.value}px`,
-                'color': textColor.value,
-                'text-align': document.getElementById('id_text_align').value
+                'color': textColor.value
             };
-
-            formatButtons.forEach(button => {
-                const format = button.dataset.format;
-                if (button.classList.contains('active')) {
-                    switch(format) {
-                        case 'bold':
-                            styles['font-weight'] = 'bold';
-                            break;
-                        case 'italic':
-                            styles['font-style'] = 'italic';
-                            break;
-                        case 'underline':
-                            styles['text-decoration'] = 'underline';
-                            break;
-                        case 'strikethrough':
-                            styles['text-decoration'] = 'line-through';
-                            break;
-                        case 'subscript':
-                            styles['vertical-align'] = 'sub';
-                            styles['font-size'] = 'smaller';
-                            break;
-                        case 'superscript':
-                            styles['vertical-align'] = 'super';
-                            styles['font-size'] = 'smaller';
-                            break;
-                    }
-                }
-            });
 
             Object.assign(content.style, styles);
         }
-
-        window.insertTemplate = function(type) {
-            const textarea = document.getElementById('id_content');
-            const templates = {
-                header: '# Your Header Here\n\n',
-                list: '• Item 1\n• Item 2\n• Item 3\n\n',
-                quote: '> Your quote here\n\n',
-                table: '| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |\n\n',
-                code: '```\nYour code here\n```\n\n'
-            };
-            
-            const cursorPos = textarea.selectionStart;
-            const textBefore = textarea.value.substring(0, cursorPos);
-            const textAfter = textarea.value.substring(textarea.selectionEnd);
-            
-            textarea.value = textBefore + templates[type] + textAfter;
-            textarea.focus();
-            textarea.selectionStart = cursorPos + templates[type].length;
-            textarea.selectionEnd = textarea.selectionStart;
-        };
 
         updatePreview();
     });

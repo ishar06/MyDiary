@@ -63,13 +63,16 @@ class DiaryEntry(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    # Text formatting options
+    # Text formatting options - simplified
     font_style = models.CharField(max_length=50, choices=FONT_CHOICES, default='Arial')
     font_size = models.CharField(max_length=3, choices=FONT_SIZE_CHOICES, default='16')
-    is_bold = models.BooleanField(default=False)
-    is_italic = models.BooleanField(default=False)
-    is_underline = models.BooleanField(default=False)
-    is_strikethrough = models.BooleanField(default=False)
+    text_color = models.CharField(max_length=7, default='#000000')  # Hex color code
+    
+    # Legacy fields - kept for compatibility
+    is_bold = models.BooleanField(null=True, default=False)
+    is_italic = models.BooleanField(null=True, default=False)
+    is_underline = models.BooleanField(null=True, default=False)
+    is_strikethrough = models.BooleanField(null=True, default=False)
 
     class Meta:
         ordering = ['-created_at']
