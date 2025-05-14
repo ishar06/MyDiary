@@ -2,79 +2,91 @@
 
 {% block title %}New Entry{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/entries.css">
+{% endblock %}
+
 {% block content %}
-<div class="form-container">
-    <h2 class="mb-4">New Diary Entry</h2>
-    <form method="post" class="needs-validation" novalidate>
-        {% csrf_token %}
-        
-        <div class="mb-3">
-            <label for="id_title" class="form-label">Title</label>
-            <input type="text" name="title" class="form-control" id="id_title" required>
-            {{ form.title.errors }}
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label">How are you feeling?</label>
-            <div class="emoji-grid">
-                {% for mood, label in form.fields.mood.choices %}
-                <div class="emoji-option" data-mood="{{ mood }}">
-                    <span class="mood-emoji">
-                        {% if mood == 'happy' %}😊
-                        {% elif mood == 'sad' %}😢
-                        {% elif mood == 'angry' %}😠
-                        {% elif mood == 'lonely' %}😔
-                        {% elif mood == 'depressed' %}😞
-                        {% elif mood == 'excited' %}😃
-                        {% elif mood == 'peaceful' %}😌
-                        {% endif %}
-                    </span>
-                    <span class="mood-label">{{ label }}</span>
-                </div>
-                {% endfor %}
+<div class="new-entry-container">
+    <div class="entry-form-container">
+        <h2 class="mb-4">New Diary Entry</h2>
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="id_title" class="form-label">Title</label>
+                <input type="text" name="title" class="form-control" id="id_title" required>
+                {{ form.title.errors }}
             </div>
-            <input type="hidden" name="mood" id="id_mood" required>
-            {{ form.mood.errors }}
-        </div>
 
-        <div class="advanced-toolbar mb-4">
-            <div class="row">
-                <div class="col-md-4 toolbar-section">
-                    <label for="id_font_style" class="form-label">Font Style</label>
-                    <select class="form-select" name="font_style" id="id_font_style">
-                        {% for value, label in form.fields.font_style.choices %}
-                        <option value="{{ value }}">{{ label }}</option>
-                        {% endfor %}
-                    </select>
+            <div class="mood-selector mb-4">
+                <label class="form-label">How are you feeling?</label>
+                <div class="emoji-grid">
+                    {% for mood, label in form.fields.mood.choices %}
+                    <div class="emoji-option" data-mood="{{ mood }}">
+                        <span class="mood-emoji">
+                            {% if mood == 'happy' %}😊
+                            {% elif mood == 'sad' %}😢
+                            {% elif mood == 'angry' %}😠
+                            {% elif mood == 'lonely' %}😔
+                            {% elif mood == 'depressed' %}😞
+                            {% elif mood == 'excited' %}😃
+                            {% elif mood == 'peaceful' %}😌
+                            {% endif %}
+                        </span>
+                        <span class="mood-label">{{ label }}</span>
+                    </div>
+                    {% endfor %}
                 </div>
-                <div class="col-md-4 toolbar-section">
-                    <label for="id_font_size" class="form-label">Font Size</label>
-                    <select class="form-select" name="font_size" id="id_font_size">
-                        {% for value, label in form.fields.font_size.choices %}
-                        <option value="{{ value }}">{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4 toolbar-section">
-                    <label for="text-color" class="form-label">Text Color</label>
-                    <input type="color" class="color-picker form-control" id="text-color" value="#000000">
+                <input type="hidden" name="mood" id="id_mood" required>
+                {{ form.mood.errors }}
+            </div>
+
+            <div class="toolbar mb-4">
+                <div class="row">
+                    <div class="col-md-4 toolbar-section">
+                        <label for="id_font_style" class="form-label">Font Style</label>
+                        <select class="form-select" name="font_style" id="id_font_style">
+                            {% for value, label in form.fields.font_style.choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 toolbar-section">
+                        <label for="id_font_size" class="form-label">Font Size</label>
+                        <select class="form-select" name="font_size" id="id_font_size">
+                            {% for value, label in form.fields.font_size.choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 toolbar-section">
+                        <label for="text-color" class="form-label">Text Color</label>
+                        <input type="color" class="color-picker form-control" id="text-color" value="#000000">
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="mb-3">
-            <label for="id_content" class="form-label">Content</label>
-            <textarea name="content" class="form-control" id="id_content" required></textarea>
-            {{ form.content.errors }}
-        </div>
+            <div class="mb-3">
+                <label for="id_content" class="form-label">Content</label>
+                <textarea name="content" class="form-control content-area" id="id_content" required></textarea>
+                {{ form.content.errors }}
+            </div>
 
-        <input type="hidden" name="text_color" id="id_text_color" value="#000000">
+            <input type="hidden" name="text_color" id="id_text_color" value="#000000">
 
-        <div class="d-flex justify-content-between">
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">Save Entry</button>
-        </div>
-    </form>
+            <div class="entry-actions">
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-entry">
+                    <i class="bi bi-x-lg"></i>
+                    <span>Cancel</span>
+                </a>
+                <button type="submit" class="btn btn-primary btn-entry">
+                    <i class="bi bi-check-lg"></i>
+                    <span>Save Entry</span>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 {% block extra_js %}
@@ -93,6 +105,14 @@
         const fontSize = document.getElementById('id_font_size');
         const textColor = document.getElementById('text-color');
         const emojiOptions = document.querySelectorAll('.emoji-option');
+        const formContainer = document.querySelector('.entry-form-container');
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const opacity = localStorage.getItem('contentOpacity') || '95';
+
+        // Apply container opacity
+        formContainer.style.backgroundColor = isDark ? 
+            `rgba(33, 37, 41, ${opacity/100})` : 
+            `rgba(255, 255, 255, ${opacity/100})`;
 
         emojiOptions.forEach(option => {
             option.addEventListener('click', function(e) {
@@ -130,6 +150,23 @@
         }
 
         updatePreview();
+
+        // Watch for theme changes
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'data-theme') {
+                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    formContainer.style.backgroundColor = isDark ? 
+                        `rgba(33, 37, 41, ${opacity/100})` : 
+                        `rgba(255, 255, 255, ${opacity/100})`;
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
     });
 </script>
 {% endblock %}
