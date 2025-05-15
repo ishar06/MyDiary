@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.db.models.functions import TruncDate, TruncMonth
 from django.utils import timezone
 from datetime import datetime, timedelta
-from .models import DiaryEntry, UserProfile
+from .models import DiaryEntry, UserProfile, DiaryImage
 from .forms import CustomUserCreationForm, DiaryEntryForm, UserProfileForm
 
 def register(request):
@@ -34,7 +34,7 @@ def home(request):
     if category_filter and category_filter != 'all':
         entries = entries.filter(category=category_filter)
     
-    entries = entries.order_by('-created_at')
+    entries = entries.prefetch_related('images').order_by('-created_at')
     context = {
         'entries': entries,
         'moods': DiaryEntry.MOOD_CHOICES,
@@ -47,11 +47,25 @@ def home(request):
 @login_required
 def new_entry(request):
     if request.method == 'POST':
-        form = DiaryEntryForm(request.POST)
+        form = DiaryEntryForm(request.POST, request.FILES)
         if form.is_valid():
             entry = form.save(commit=False)
             entry.user = request.user
             entry.save()
+            
+            # Handle image uploads
+            images = request.FILES.getlist('images')
+            captions = request.POST.get('image_captions', '').split('\n')
+            captions = [cap.strip() for cap in captions if cap.strip()]
+            
+            for i, image in enumerate(images[:3]):  # Limit to 3 images
+                caption = captions[i] if i < len(captions) else ''
+                diary_image = DiaryImage.objects.create(
+                    image=image,
+                    caption=caption
+                )
+                entry.images.add(diary_image)
+            
             messages.success(request, 'Diary entry created successfully!')
             return redirect('home')
     else:
@@ -62,14 +76,37 @@ def new_entry(request):
 def edit_entry(request, pk):
     entry = get_object_or_404(DiaryEntry, pk=pk, user=request.user)
     if request.method == 'POST':
-        form = DiaryEntryForm(request.POST, instance=entry)
+        form = DiaryEntryForm(request.POST, request.FILES, instance=entry)
         if form.is_valid():
             form.save()
+            
+            # Handle new image uploads
+            images = request.FILES.getlist('images')
+            captions = request.POST.get('image_captions', '').split('\n')
+            captions = [cap.strip() for cap in captions if cap.strip()]
+            
+            current_count = entry.images.count()
+            remaining_slots = 3 - current_count
+            
+            for i, image in enumerate(images[:remaining_slots]):
+                caption = captions[i] if i < len(captions) else ''
+                diary_image = DiaryImage.objects.create(
+                    image=image,
+                    caption=caption
+                )
+                entry.images.add(diary_image)
+            
             messages.success(request, 'Diary entry updated successfully!')
             return redirect('home')
     else:
         form = DiaryEntryForm(instance=entry)
-    return render(request, 'diary/edit_entry.html', {'form': form, 'entry': entry})
+    
+    context = {
+        'form': form,
+        'entry': entry,
+        'entry_images': entry.images.all()
+    }
+    return render(request, 'diary/edit_entry.html', context)
 
 @login_required
 def delete_entry(request, pk):
@@ -78,6 +115,19 @@ def delete_entry(request, pk):
         entry.delete()
         messages.success(request, 'Diary entry deleted successfully!')
     return redirect('home')
+
+@login_required
+def delete_image(request, entry_pk, image_pk):
+    entry = get_object_or_404(DiaryEntry, pk=entry_pk, user=request.user)
+    image = get_object_or_404(DiaryImage, pk=image_pk)
+    
+    if request.method == 'POST':
+        if image in entry.images.all():
+            entry.images.remove(image)
+            image.delete()  # This will also delete the file
+            messages.success(request, 'Image deleted successfully!')
+        
+    return redirect('edit_entry', pk=entry_pk)
 
 @login_required
 def search_entries(request):
@@ -98,7 +148,7 @@ def search_entries(request):
     if category_filter and category_filter != 'all':
         entries = entries.filter(category=category_filter)
     
-    entries = entries.order_by('-created_at')
+    entries = entries.prefetch_related('images').order_by('-created_at')
     
     context = {
         'entries': entries,

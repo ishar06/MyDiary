@@ -28,6 +28,14 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.userprofile.save()
 
+class DiaryImage(models.Model):
+    image = models.ImageField(upload_to='diary_images/%Y/%m/%d/')
+    caption = models.CharField(max_length=200, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image uploaded at {self.uploaded_at}"
+
 class DiaryEntry(models.Model):
     MOOD_CHOICES = [
         ('happy', 'Happy'),
@@ -82,6 +90,9 @@ class DiaryEntry(models.Model):
     is_italic = models.BooleanField(null=True, default=False)
     is_underline = models.BooleanField(null=True, default=False)
     is_strikethrough = models.BooleanField(null=True, default=False)
+
+    # Add images field
+    images = models.ManyToManyField(DiaryImage, blank=True)
 
     class Meta:
         ordering = ['-created_at']

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import DiaryEntry, UserProfile
+from .models import DiaryEntry, UserProfile, DiaryImage
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -10,7 +10,33 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = UserCreationForm.Meta.fields + ('email',)
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
 class DiaryEntryForm(forms.ModelForm):
+    images = MultipleFileField(
+        required=False,
+        widget=MultipleFileInput(attrs={'class': 'form-control', 'accept': 'image/*'})
+    )
+    image_captions = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+        help_text='Enter captions for images, one per line'
+    )
+
     class Meta:
         model = DiaryEntry
         fields = ['title', 'content', 'mood', 'category', 'font_size', 'font_style', 'text_color']
