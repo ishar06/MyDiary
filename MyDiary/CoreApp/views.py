@@ -21,16 +21,22 @@ def register(request):
 @login_required
 def home(request):
     mood_filter = request.GET.get('mood', '')
+    category_filter = request.GET.get('category', '')
     entries = DiaryEntry.objects.filter(user=request.user)
     
     if mood_filter:
         entries = entries.filter(mood=mood_filter)
     
+    if category_filter and category_filter != 'all':
+        entries = entries.filter(category=category_filter)
+    
     entries = entries.order_by('-created_at')
     context = {
         'entries': entries,
         'moods': DiaryEntry.MOOD_CHOICES,
-        'current_mood': mood_filter
+        'categories': DiaryEntry.CATEGORY_CHOICES,
+        'current_mood': mood_filter,
+        'current_category': category_filter
     }
     return render(request, 'home.html', context)
 
@@ -73,6 +79,7 @@ def delete_entry(request, pk):
 def search_entries(request):
     query = request.GET.get('q', '')
     mood_filter = request.GET.get('mood', '')
+    category_filter = request.GET.get('category', '')
     
     entries = DiaryEntry.objects.filter(user=request.user)
     
@@ -84,13 +91,18 @@ def search_entries(request):
     if mood_filter:
         entries = entries.filter(mood=mood_filter)
     
+    if category_filter and category_filter != 'all':
+        entries = entries.filter(category=category_filter)
+    
     entries = entries.order_by('-created_at')
     
     context = {
         'entries': entries,
         'query': query,
         'moods': DiaryEntry.MOOD_CHOICES,
-        'current_mood': mood_filter
+        'categories': DiaryEntry.CATEGORY_CHOICES,
+        'current_mood': mood_filter,
+        'current_category': category_filter
     }
     return render(request, 'diary/search_results.html', context)
 

@@ -119,6 +119,52 @@
     [data-theme="dark"] .no-results {
         background: rgba(33, 37, 41, 0.95);
     }
+
+    .category-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.875rem;
+        margin-right: 0.5rem;
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .filter-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .category-filter {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        transition: all 0.2s;
+        color: var(--text-color);
+        margin: 0.25rem;
+    }
+
+    .category-filter:hover {
+        background: rgba(74, 144, 226, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .category-filter.active {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .filter-icon {
+        margin-right: 0.5rem;
+    }
 </style>
 
 <div class="search-container">
@@ -142,35 +188,62 @@
             {% endif %}
         </div>
 
-        <div class="mood-filters">
-            <a href="?" class="mood-filter {% if not current_mood %}active{% endif %}">
-                <span class="mood-emoji">🌟</span>
-                <span>All Moods</span>
-            </a>
-            {% for mood, label in moods %}
-            <a href="?{% if query %}q={{ query }}&{% endif %}mood={{ mood }}" 
-               class="mood-filter {% if current_mood == mood %}active{% endif %}">
-                <span class="mood-emoji">
-                    {% if mood == 'happy' %}😊
-                    {% elif mood == 'sad' %}😢
-                    {% elif mood == 'angry' %}😠
-                    {% elif mood == 'lonely' %}😔
-                    {% elif mood == 'depressed' %}😞
-                    {% elif mood == 'excited' %}😃
-                    {% elif mood == 'peaceful' %}😌
-                    {% elif mood == 'anxious' %}😰
-                    {% elif mood == 'grateful' %}🙏
-                    {% elif mood == 'tired' %}😴
-                    {% elif mood == 'loved' %}🥰
-                    {% elif mood == 'proud' %}😎
-                    {% elif mood == 'confused' %}😕
-                    {% elif mood == 'hopeful' %}🌟
-                    {% elif mood == 'motivated' %}💪
-                    {% endif %}
-                </span>
-                <span>{{ label }}</span>
-            </a>
-            {% endfor %}
+        <div class="filter-section">
+            <div class="filter-group">
+                <h6>Filter by Mood</h6>
+                <div class="mood-filters">
+                    <a href="?" class="mood-filter {% if not current_mood %}active{% endif %}">
+                        <span class="mood-emoji">🌟</span>
+                        <span>All Moods</span>
+                    </a>
+                    {% for mood, label in moods %}
+                    <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}mood={{ mood }}" 
+                       class="mood-filter {% if current_mood == mood %}active{% endif %}">
+                        <span class="mood-emoji">
+                            {% if mood == 'happy' %}😊
+                            {% elif mood == 'sad' %}😢
+                            {% elif mood == 'angry' %}😠
+                            {% elif mood == 'lonely' %}😔
+                            {% elif mood == 'depressed' %}😞
+                            {% elif mood == 'excited' %}😃
+                            {% elif mood == 'peaceful' %}😌
+                            {% elif mood == 'anxious' %}😰
+                            {% elif mood == 'grateful' %}🙏
+                            {% elif mood == 'tired' %}😴
+                            {% elif mood == 'loved' %}🥰
+                            {% elif mood == 'proud' %}😎
+                            {% elif mood == 'confused' %}😕
+                            {% elif mood == 'hopeful' %}🌟
+                            {% elif mood == 'motivated' %}💪
+                            {% endif %}
+                        </span>
+                        <span>{{ label }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h6>Filter by Category</h6>
+                <div>
+                    <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_mood %}mood={{ current_mood }}{% endif %}"
+                       class="category-filter {% if not current_category %}active{% endif %}">
+                        <i class="bi bi-collection filter-icon"></i>
+                        <span>All Categories</span>
+                    </a>
+                    {% for category, label in categories %}
+                    <a href="?{% if query %}q={{ query }}&{% endif %}{% if current_mood %}mood={{ current_mood }}&{% endif %}category={{ category }}"
+                       class="category-filter {% if current_category == category %}active{% endif %}">
+                        <i class="bi {% if category == 'personal' %}bi-person
+                                   {% elif category == 'work' %}bi-briefcase
+                                   {% elif category == 'travel' %}bi-airplane
+                                   {% elif category == 'health' %}bi-heart-pulse
+                                   {% else %}bi-three-dots{% endif %} filter-icon"></i>
+                        <span>{{ label }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 
@@ -198,6 +271,14 @@
                         {% endif %}
                     </span>
                     <h3 class="entry-title d-inline">{{ entry.title }}</h3>
+                    <span class="category-badge">
+                        <i class="bi {% if entry.category == 'personal' %}bi-person
+                                   {% elif entry.category == 'work' %}bi-briefcase
+                                   {% elif entry.category == 'travel' %}bi-airplane
+                                   {% elif entry.category == 'health' %}bi-heart-pulse
+                                   {% else %}bi-three-dots{% endif %}"></i>
+                        {{ entry.get_category_display }}
+                    </span>
                 </div>
                 <span class="entry-date">{{ entry.created_at|date:"F j, Y" }}</span>
             </div>
@@ -225,9 +306,9 @@
             <h3>No entries found</h3>
             <p class="text-muted">
                 {% if query %}
-                    Try different search terms or mood filters
+                    Try different search terms or adjust your filters
                 {% else %}
-                    No entries match the selected mood filter
+                    No entries match the selected filters
                 {% endif %}
             </p>
             <div class="mt-3">

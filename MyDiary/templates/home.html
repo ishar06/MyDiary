@@ -135,6 +135,46 @@
         font-family: var(--entry-font-style);
         color: var(--entry-text-color);
     }
+
+    .category-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.875rem;
+        margin-right: 0.5rem;
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .category-filters {
+        margin-top: 2rem;
+        border-top: 1px solid var(--border-color);
+        padding-top: 1rem;
+    }
+
+    .category-filter {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .category-filter:hover {
+        background-color: rgba(74, 144, 226, 0.1);
+    }
+
+    .category-filter.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .filter-icon {
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+    }
 </style>
 
 <div class="diary-container">
@@ -154,12 +194,14 @@
 
         <div class="mood-filters mt-4">
             <h5>Filter by Mood</h5>
-            <a href="{% url 'home' %}" class="mood-filter {% if not current_mood %}active{% endif %}">
+            <a href="{% url 'home' %}{% if current_category %}?category={{ current_category }}{% endif %}" 
+               class="mood-filter {% if not current_mood %}active{% endif %}">
                 <span class="mood-indicator">🌟</span>
                 <span>All Moods</span>
             </a>
             {% for mood, label in moods %}
-            <a href="?mood={{ mood }}" class="mood-filter {% if current_mood == mood %}active{% endif %}">
+            <a href="?mood={{ mood }}{% if current_category %}&category={{ current_category }}{% endif %}" 
+               class="mood-filter {% if current_mood == mood %}active{% endif %}">
                 <span class="mood-indicator">
                     {% if mood == 'happy' %}😊
                     {% elif mood == 'sad' %}😢
@@ -170,6 +212,26 @@
                     {% elif mood == 'peaceful' %}😌
                     {% endif %}
                 </span>
+                <span>{{ label }}</span>
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="category-filters">
+            <h5>Filter by Category</h5>
+            <a href="{% url 'home' %}{% if current_mood %}?mood={{ current_mood }}{% endif %}"
+               class="category-filter {% if not current_category %}active{% endif %}">
+                <i class="bi bi-collection filter-icon"></i>
+                <span>All Categories</span>
+            </a>
+            {% for category, label in categories %}
+            <a href="?category={{ category }}{% if current_mood %}&mood={{ current_mood }}{% endif %}"
+               class="category-filter {% if current_category == category %}active{% endif %}">
+                <i class="bi {% if category == 'personal' %}bi-person
+                           {% elif category == 'work' %}bi-briefcase
+                           {% elif category == 'travel' %}bi-airplane
+                           {% elif category == 'health' %}bi-heart-pulse
+                           {% else %}bi-three-dots{% endif %} filter-icon"></i>
                 <span>{{ label }}</span>
             </a>
             {% endfor %}
@@ -193,6 +255,14 @@
                             {% endif %}
                         </span>
                         <h3 class="entry-title d-inline">{{ entry.title }}</h3>
+                        <span class="category-badge">
+                            <i class="bi {% if entry.category == 'personal' %}bi-person
+                                       {% elif entry.category == 'work' %}bi-briefcase
+                                       {% elif entry.category == 'travel' %}bi-airplane
+                                       {% elif entry.category == 'health' %}bi-heart-pulse
+                                       {% else %}bi-three-dots{% endif %}"></i>
+                            {{ entry.get_category_display }}
+                        </span>
                     </div>
                     <span class="entry-date">{{ entry.created_at|date:"F j, Y" }}</span>
                 </div>

@@ -39,6 +39,14 @@ class DiaryEntry(models.Model):
         ('peaceful', 'Peaceful'),
     ]
 
+    CATEGORY_CHOICES = [
+        ('personal', 'Personal'),
+        ('work', 'Work'),
+        ('travel', 'Travel'),
+        ('health', 'Health'),
+        ('others', 'Others'),
+    ]
+
     FONT_CHOICES = [
         ('Arial', 'Arial'),
         ('Times New Roman', 'Times New Roman'),
@@ -60,6 +68,7 @@ class DiaryEntry(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     mood = models.CharField(max_length=20, choices=MOOD_CHOICES)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='personal')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

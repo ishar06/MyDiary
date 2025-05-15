@@ -4,6 +4,11 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="/static/css/entries.css">
+<style>
+    .emoji-option .mood-emoji {
+        pointer-events: none;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -22,6 +27,16 @@
                 <label for="id_title" class="form-label">Title</label>
                 <input type="text" name="title" class="form-control" id="id_title" value="{{ entry.title }}" required>
                 {{ form.title.errors }}
+            </div>
+
+            <div class="mb-3">
+                <label for="id_category" class="form-label">Category</label>
+                <select name="category" class="form-control" id="id_category" required>
+                    {% for value, label in form.fields.category.choices %}
+                    <option value="{{ value }}" {% if entry.category == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                {{ form.category.errors }}
             </div>
 
             <div class="mood-selector mb-4">
@@ -137,15 +152,6 @@
                 e.preventDefault();
                 selectMood(this, this.dataset.mood);
             });
-            
-            const emoji = option.querySelector('.mood-emoji');
-            if (emoji) {
-                emoji.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    selectMood(this.parentElement, this.parentElement.dataset.mood);
-                });
-            }
         });
 
         textColor.addEventListener('change', function() {

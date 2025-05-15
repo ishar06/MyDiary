@@ -13,11 +13,12 @@ class CustomUserCreationForm(UserCreationForm):
 class DiaryEntryForm(forms.ModelForm):
     class Meta:
         model = DiaryEntry
-        fields = ['title', 'content', 'mood', 'font_size', 'font_style', 'text_color']
+        fields = ['title', 'content', 'mood', 'category', 'font_size', 'font_style', 'text_color']
         widgets = {
             'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 10}),
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'mood': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
             'font_size': forms.Select(attrs={'class': 'form-control'}),
             'font_style': forms.Select(attrs={'class': 'form-control'}),
             'text_color': forms.HiddenInput(),
