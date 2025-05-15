@@ -36,7 +36,6 @@ MyDiary/
 │   ├── Diary/                # Diary-related views and models
 │   ├── templates/            # HTML templates
 │   ├── static/               # Static files (CSS, JS, images)
-│   ├── staticfiles/          # Collected static files (via collectstatic)
 │   ├── manage.py             # Django management script
 │   ├── settings.py           # Project settings
 │   └── urls.py               # URL routing
