@@ -9,4 +9,5 @@ urlpatterns = [
     path('delete/<int:pk>/', views.delete_entry, name='delete_entry'),
     path('search/', views.search_entries, name='search_entries'),
     path('profile/', views.profile, name='profile'),
+    path('stats/', views.get_stats, name='get_stats'),
 ]

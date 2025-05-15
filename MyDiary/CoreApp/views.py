@@ -2,7 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import login
-from django.db.models import Q
+from django.db.models import Q, Count
+from django.http import JsonResponse
+from django.db.models.functions import TruncDate, TruncMonth
+from django.utils import timezone
+from datetime import datetime, timedelta
 from .models import DiaryEntry, UserProfile
 from .forms import CustomUserCreationForm, DiaryEntryForm, UserProfileForm
 
@@ -125,3 +129,88 @@ def profile(request):
         form = UserProfileForm(instance=request.user.userprofile)
     
     return render(request, 'profile.html', {'form': form})
+
+@login_required
+def get_stats(request):
+    # Get user's entries
+    entries = DiaryEntry.objects.filter(user=request.user)
+    
+    # Calculate total entries
+    total_entries = entries.count()
+    
+    # Get mood distribution
+    mood_stats = entries.values('mood').annotate(count=Count('id'))
+    mood_distribution = {item['mood']: item['count'] for item in mood_stats}
+    
+    # Get category distribution
+    category_stats = entries.values('category').annotate(count=Count('id'))
+    category_distribution = {item['category']: item['count'] for item in category_stats}
+    
+    # Get entries per day (last 30 days)
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    daily_entries = (
+        entries.filter(created_at__gte=thirty_days_ago)
+        .annotate(date=TruncDate('created_at'))
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('date')
+    )
+    
+    timeline_data = {
+        'dates': [item['date'].strftime('%Y-%m-%d') for item in daily_entries],
+        'counts': [item['count'] for item in daily_entries]
+    }
+    
+    # Calculate streak
+    current_streak = 0
+    longest_streak = 0
+    last_date = None
+    
+    daily_entries = entries.annotate(date=TruncDate('created_at')).values('date').distinct().order_by('-date')
+    
+    for entry in daily_entries:
+        current_date = entry['date']
+        if last_date is None:
+            current_streak = 1
+        elif (last_date - current_date).days == 1:
+            current_streak += 1
+        else:
+            longest_streak = max(longest_streak, current_streak)
+            current_streak = 1
+        last_date = current_date
+    
+    longest_streak = max(longest_streak, current_streak)
+    
+    # Get monthly trend
+    monthly_stats = (
+        entries.annotate(month=TruncMonth('created_at'))
+        .values('month')
+        .annotate(count=Count('id'))
+        .order_by('month')
+    )
+    
+    monthly_trend = {
+        'months': [item['month'].strftime('%Y-%m') for item in monthly_stats],
+        'counts': [item['count'] for item in monthly_stats]
+    }
+    
+    # Calculate average entries per day
+    if total_entries > 0:
+        first_entry = entries.order_by('created_at').first()
+        days_since_first = (timezone.now().date() - first_entry.created_at.date()).days + 1
+        avg_entries_per_day = round(total_entries / days_since_first, 2)
+    else:
+        avg_entries_per_day = 0
+    
+    stats = {
+        'total_entries': total_entries,
+        'mood_distribution': mood_distribution,
+        'category_distribution': category_distribution,
+        'timeline_data': timeline_data,
+        'current_streak': current_streak,
+        'longest_streak': longest_streak,
+        'monthly_trend': monthly_trend,
+        'avg_entries_per_day': avg_entries_per_day
+    }
+    
+    return JsonResponse(stats)

@@ -136,18 +136,68 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Your Diary Stats</h5>
+                    <h5 class="modal-title"><i class="bi bi-graph-up"></i> Your Diary Stats</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
+                    <div class="stats-overview mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <h6>Total Entries</h6>
+                                    <div class="stat-value" id="totalEntries">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <h6>Current Streak</h6>
+                                    <div class="stat-value" id="currentStreak">-</div>
+                                    <small>days</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <h6>Longest Streak</h6>
+                                    <div class="stat-value" id="longestStreak">-</div>
+                                    <small>days</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <h6>Avg. Entries/Day</h6>
+                                    <div class="stat-value" id="avgEntriesPerDay">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
                         <div class="col-md-6">
-                            <h6>Mood Distribution</h6>
-                            <canvas id="moodChart"></canvas>
+                            <div class="chart-container">
+                                <h6>Mood Distribution</h6>
+                                <canvas id="moodChart"></canvas>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <h6>Entry Timeline</h6>
-                            <canvas id="timelineChart"></canvas>
+                            <div class="chart-container">
+                                <h6>Category Distribution</h6>
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h6>Last 30 Days Activity</h6>
+                                <canvas id="timelineChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <h6>Monthly Trend</h6>
+                                <canvas id="monthlyTrendChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -281,8 +331,182 @@
                 const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
                 modal.hide();
             };
+
+            // Stats charts initialization
+            let moodChart, categoryChart, timelineChart, monthlyTrendChart;
+            
+            // Initialize charts with empty data
+            function initCharts() {
+                const ctx1 = document.getElementById('moodChart').getContext('2d');
+                const ctx2 = document.getElementById('categoryChart').getContext('2d');
+                const ctx3 = document.getElementById('timelineChart').getContext('2d');
+                const ctx4 = document.getElementById('monthlyTrendChart').getContext('2d');
+
+                moodChart = new Chart(ctx1, {
+                    type: 'doughnut',
+                    data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right' } }
+                    }
+                });
+
+                categoryChart = new Chart(ctx2, {
+                    type: 'pie',
+                    data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right' } }
+                    }
+                });
+
+                timelineChart = new Chart(ctx3, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Number of Entries',
+                            data: [],
+                            borderColor: '#4a90e2',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                        }
+                    }
+                });
+
+                monthlyTrendChart = new Chart(ctx4, {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Entries per Month',
+                            data: [],
+                            backgroundColor: '#4a90e2'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                        }
+                    }
+                });
+            }
+
+            // Update charts with new data
+            function updateCharts(stats) {
+                const moodColors = {
+                    'happy': '#ffd700',
+                    'sad': '#6c757d',
+                    'angry': '#dc3545',
+                    'lonely': '#6610f2',
+                    'depressed': '#343a40',
+                    'excited': '#fd7e14',
+                    'peaceful': '#20c997'
+                };
+
+                const categoryColors = {
+                    'personal': '#4a90e2',
+                    'work': '#f39c12',
+                    'travel': '#2ecc71',
+                    'health': '#e74c3c',
+                    'others': '#95a5a6'
+                };
+
+                // Update overview stats
+                document.getElementById('totalEntries').textContent = stats.total_entries;
+                document.getElementById('currentStreak').textContent = stats.current_streak;
+                document.getElementById('longestStreak').textContent = stats.longest_streak;
+                document.getElementById('avgEntriesPerDay').textContent = stats.avg_entries_per_day;
+
+                // Update mood chart
+                moodChart.data.labels = Object.keys(stats.mood_distribution);
+                moodChart.data.datasets[0].data = Object.values(stats.mood_distribution);
+                moodChart.data.datasets[0].backgroundColor = moodChart.data.labels.map(mood => moodColors[mood]);
+                moodChart.update();
+
+                // Update category chart
+                categoryChart.data.labels = Object.keys(stats.category_distribution);
+                categoryChart.data.datasets[0].data = Object.values(stats.category_distribution);
+                categoryChart.data.datasets[0].backgroundColor = categoryChart.data.labels.map(category => categoryColors[category]);
+                categoryChart.update();
+
+                // Update timeline chart
+                timelineChart.data.labels = stats.timeline_data.dates;
+                timelineChart.data.datasets[0].data = stats.timeline_data.counts;
+                timelineChart.update();
+
+                // Update monthly trend chart
+                monthlyTrendChart.data.labels = stats.monthly_trend.months;
+                monthlyTrendChart.data.datasets[0].data = stats.monthly_trend.counts;
+                monthlyTrendChart.update();
+            }
+
+            // Load stats when modal is opened
+            const statsModal = document.getElementById('statsModal');
+            statsModal.addEventListener('show.bs.modal', function() {
+                // Initialize charts if not already done
+                if (!moodChart) {
+                    initCharts();
+                }
+
+                // Fetch stats data
+                fetch('/stats/')
+                    .then(response => response.json())
+                    .then(data => {
+                        updateCharts(data);
+                    })
+                    .catch(error => console.error('Error fetching stats:', error));
+            });
         });
     </script>
-    {% block extra_js %}{% endblock %}
+
+    <!-- Add custom styles for stats -->
+    <style>
+        .stats-overview .stat-card {
+            background: var(--modal-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 100%;
+        }
+
+        .stats-overview .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            line-height: 1;
+            margin: 0.5rem 0;
+        }
+
+        .chart-container {
+            background: var(--modal-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            height: 300px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .chart-container h6 {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        [data-theme="dark"] .stat-card,
+        [data-theme="dark"] .chart-container {
+            background: rgba(33, 37, 41, 0.95);
+        }
+    </style>
 </body>
 </html>
