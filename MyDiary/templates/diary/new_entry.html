@@ -5,6 +5,9 @@
 {% block extra_css %}
 <link rel="stylesheet" href="/static/css/entries.css">
 <style>
+    .emoji-option {
+        margin-top: 10px;
+    }
     .emoji-option .mood-emoji {
         pointer-events: none;
     }
@@ -69,6 +72,7 @@
 
             <div class="mood-selector mb-4">
                 <label class="form-label">How are you feeling?</label>
+                <br><br>
                 <div class="emoji-grid">
                     {% for mood, label in form.fields.mood.choices %}
                     <div class="emoji-option" data-mood="{{ mood }}">
