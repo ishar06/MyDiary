@@ -92,7 +92,11 @@ pip install -r requirements.txt
 If `requirements.txt` doesn't exist yet, install manually:
 
 ```bash
-pip install asgiref Django django-jazzmin sqlparse
+pip install asgiref sqlparse
+pip install django
+pip install django-jazzmin
+pip install django-ckeditor
+pip install Pillow
 ```
 
 ```bash
