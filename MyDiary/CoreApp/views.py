@@ -34,7 +34,7 @@ def home(request):
     if category_filter and category_filter != 'all':
         entries = entries.filter(category=category_filter)
     
-    entries = entries.prefetch_related('images').order_by('-created_at')
+    entries = entries.prefetch_related('images').order_by('-created_at')[:10]  # Only get latest 10 entries
     context = {
         'entries': entries,
         'moods': DiaryEntry.MOOD_CHOICES,
