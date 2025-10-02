@@ -1,3 +1,9 @@
 env/
 MyDiary/db.sqlite3
 MyDiary/media/*
+../.DS_Store
+.DS_Store
+__pycache__/
+MyDiary/CoreApp/__pycache__/
+MyDiary/CoreApp/migrations/__pycache__/
+MyDiary/Diary/__pycache__/
