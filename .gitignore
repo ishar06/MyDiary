@@ -7,3 +7,4 @@ __pycache__/
 MyDiary/CoreApp/__pycache__/
 MyDiary/CoreApp/migrations/__pycache__/
 MyDiary/Diary/__pycache__/
+MyDiary/CoreApp/migrations/*

@@ -6,6 +6,7 @@
     <title>MyDiary - {% block title %}{% block title_text %}{% endblock %}{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/diary.css">
     {% block extra_css %}{% endblock %}
@@ -236,6 +237,18 @@
                             <span class="opacity-value" id="opacity-value">95%</span>
                         </div>
                     </div>
+
+                    <div class="settings-section">
+                        <h6 class="settings-title">Website Font Style</h6>
+                        <p class="settings-title small mb-2">Choose the font style for the entire website</p>
+                        <div class="btn-group w-100" id="font-style-buttons">
+                            <button type="button" class="btn btn-outline-primary active" data-font="Poppins">Poppins</button>
+                            <button type="button" class="btn btn-outline-primary" data-font="Arial">Arial</button>
+                            <button type="button" class="btn btn-outline-primary" data-font="Times New Roman">Times New Roman</button>
+                            <button type="button" class="btn btn-outline-primary" data-font="Georgia">Georgia</button>
+                            <button type="button" class="btn btn-outline-primary" data-font="Verdana">Verdana</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -321,11 +334,47 @@
                 });
             }
 
+            // Font style initialization and handling
+            const fontButtons = document.querySelectorAll('#font-style-buttons .btn');
+            const savedFont = localStorage.getItem('websiteFont') || 'Poppins';
+            
+            function applyFont(fontFamily) {
+                document.body.style.fontFamily = `"${fontFamily}", sans-serif`;
+                localStorage.setItem('websiteFont', fontFamily);
+                
+                // Update active button state
+                fontButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-font') === fontFamily);
+                });
+            }
+            
+            // Initialize font style
+            applyFont(savedFont);
+            
+            // Add click handlers for font style buttons
+            fontButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const fontFamily = button.getAttribute('data-font');
+                    applyFont(fontFamily);
+                });
+            });
+
             // Save settings function
             window.saveSettings = function() {
                 const opacity = opacityRange.value;
                 localStorage.setItem('contentOpacity', opacity);
                 localStorage.setItem('theme', document.documentElement.getAttribute('data-theme'));
+                
+                // Update container opacity
+                const containers = document.querySelectorAll('.sidebar, .entry-card, .search-header, .auth-box, .entry-form-container');
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const bgColor = isDark ? 
+                    `rgba(33, 37, 41, ${opacity/100})` : 
+                    `rgba(255, 255, 255, ${opacity/100})`;
+                
+                containers.forEach(container => {
+                    container.style.backgroundColor = bgColor;
+                });
                 
                 // Close modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));

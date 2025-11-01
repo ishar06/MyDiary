@@ -56,6 +56,7 @@ class DiaryEntry(models.Model):
     ]
 
     FONT_CHOICES = [
+        ('Poppins', 'Poppins'),
         ('Arial', 'Arial'),
         ('Times New Roman', 'Times New Roman'),
         ('Courier New', 'Courier New'),
@@ -81,7 +82,7 @@ class DiaryEntry(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     # Text formatting options - simplified
-    font_style = models.CharField(max_length=50, choices=FONT_CHOICES, default='Arial')
+    font_style = models.CharField(max_length=50, choices=FONT_CHOICES, default='Poppins')
     font_size = models.CharField(max_length=3, choices=FONT_SIZE_CHOICES, default='16')
     text_color = models.CharField(max_length=7, default='#000000')  # Hex color code
     
