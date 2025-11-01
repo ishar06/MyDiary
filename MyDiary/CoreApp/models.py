@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from .encryption import EncryptedTextField
 
 class UserProfile(models.Model):
     GENDER_CHOICES = [
@@ -74,8 +75,8 @@ class DiaryEntry(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    content = models.TextField()
+    title = EncryptedTextField(max_length=200)
+    content = EncryptedTextField()
     mood = models.CharField(max_length=20, choices=MOOD_CHOICES)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='personal')
     created_at = models.DateTimeField(auto_now_add=True)

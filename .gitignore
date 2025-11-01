@@ -1,10 +1,55 @@
-env/
-MyDiary/db.sqlite3
-MyDiary/media/*
-../.DS_Store
-.DS_Store
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+MyDiary/db.sqlite3
+media/
+MyDiary/media/*
+
+# Secret Keys and Environment Variables - IMPORTANT for security
+.env
+.env.*
+!.env.example
+encryption_keys/
+generate_key.py
+**/settings_local.py
+**/settings_production.py
+
+# Migrations and Cache
 MyDiary/CoreApp/__pycache__/
 MyDiary/CoreApp/migrations/__pycache__/
 MyDiary/Diary/__pycache__/
 MyDiary/CoreApp/migrations/*
+!MyDiary/CoreApp/migrations/__init__.py
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+../.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backups and Temporary files
+*.bak
+backup/
+temp/
