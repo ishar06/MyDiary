@@ -26,6 +26,8 @@ def register(request):
 def home(request):
     mood_filter = request.GET.get('mood', '')
     category_filter = request.GET.get('category', '')
+    sort_by = request.GET.get('sort', '-created_at')  # Default to newest first
+    
     entries = DiaryEntry.objects.filter(user=request.user)
     
     if mood_filter:
@@ -34,13 +36,31 @@ def home(request):
     if category_filter and category_filter != 'all':
         entries = entries.filter(category=category_filter)
     
-    entries = entries.prefetch_related('images').order_by('-created_at')[:10]  # Only get latest 10 entries
+    # Apply sorting
+    if sort_by == 'oldest':
+        entries = entries.order_by('created_at')
+    elif sort_by == 'title':
+        entries = entries.order_by('title')
+    elif sort_by == 'title_desc':
+        entries = entries.order_by('-title')
+    else:  # newest first (default)
+        entries = entries.order_by('-created_at')
+    
+    entries = entries.prefetch_related('images')
+    
+    # Pagination
+    from django.core.paginator import Paginator
+    paginator = Paginator(entries, 10)  # Show 10 entries per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        'entries': entries,
+        'entries': page_obj,
         'moods': DiaryEntry.MOOD_CHOICES,
         'categories': DiaryEntry.CATEGORY_CHOICES,
         'current_mood': mood_filter,
-        'current_category': category_filter
+        'current_category': category_filter,
+        'current_sort': sort_by
     }
     return render(request, 'home.html', context)
 

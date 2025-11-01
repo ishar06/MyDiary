@@ -46,6 +46,33 @@
         transition: all 0.3s;
     }
 
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .pagination a, .pagination .current-page {
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 5px;
+        text-decoration: none;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+    .pagination .current-page {
+        background: #007bff;
+        color: white;
+    }
+
+    .pagination a:hover {
+        background: #007bff;
+        color: white;
+    }
+
     [data-theme="dark"] .entry-card {
         background: rgba(33, 37, 41, 0.95);
     }
@@ -282,6 +309,15 @@
     </aside>
 
     <main class="main-content">
+        <div class="mb-4">
+            <select class="form-select" onchange="window.location.href=this.value">
+                <option value="?sort=-created_at{% if current_mood %}&mood={{ current_mood }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" {% if current_sort == '-created_at' %}selected{% endif %}>Newest First</option>
+                <option value="?sort=oldest{% if current_mood %}&mood={{ current_mood }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                <option value="?sort=title{% if current_mood %}&mood={{ current_mood }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" {% if current_sort == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                <option value="?sort=title_desc{% if current_mood %}&mood={{ current_mood }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" {% if current_sort == 'title_desc' %}selected{% endif %}>Title (Z-A)</option>
+            </select>
+        </div>
+
         {% if entries %}
             {% for entry in entries %}
             <article class="entry-card">
@@ -348,6 +384,26 @@
                     <i class="bi bi-plus-lg"></i> Create Your First Entry
                 </a>
             </div>
+        {% endif %}
+
+        {% if entries.paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if entries.has_previous %}
+                <a href="?page={{ entries.previous_page_number }}{% if current_mood %}&mood={{ current_mood }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">Previous</a>
+            {% endif %}
+
+            {% for num in entries.paginator.page_range %}
+                {% if num == entries.number %}
+                    <span class="current-page">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}{% if current_mood %}&mood={{ current_mood }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if entries.has_next %}
+                <a href="?page={{ entries.next_page_number }}{% if current_mood %}&mood={{ current_mood }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}">Next</a>
+            {% endif %}
+        </div>
         {% endif %}
     </main>
 </div>
