@@ -2,8 +2,8 @@
 .diary-container {
     display: flex;
     gap: 2rem;
-    margin: 2rem;
-    margin-top: 2rem;
+    margin: 2rem 2rem 0 2rem;
+    padding-bottom: 2rem;
 }
 
 .sidebar {
