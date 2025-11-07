@@ -23,11 +23,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-9gv(7m%kcuz@bzt$r_q9842&08^zvv^xh7%*(@^dp*90$k$cv*"
 
-# Encryption key for diary entries - loaded from local settings
-ENCRYPTION_KEY = None  # This will be overridden by local settings
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+# Load local settings if they exist
+try:
+    from .settings_local import *
+except ImportError:
+    ENCRYPTION_KEY = None  # This will be overridden by local settings
 
 ALLOWED_HOSTS = []
 

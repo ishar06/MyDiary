@@ -1,21 +1,19 @@
 from cryptography.fernet import Fernet
 from django.conf import settings
 from django.db import models
-import base64
 
 class EncryptedTextField(models.TextField):
-    description = "Encrypted text field"
+    """
+    A custom TextField that encrypts data before saving to database and decrypts when retrieving.
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def get_encryption_key(self):
-        # Get or generate a key from Django settings
         key = getattr(settings, 'ENCRYPTION_KEY', None)
         if key is None:
-            # Generate a new key if none exists
             key = Fernet.generate_key()
-            # You should save this key somewhere secure!
         return key
 
     def get_fernet(self):
@@ -25,29 +23,40 @@ class EncryptedTextField(models.TextField):
         if value is None:
             return value
         try:
-            f = self.get_fernet()
-            decrypted = f.decrypt(value.encode())
-            return decrypted.decode()
-        except Exception:
-            # If decryption fails, return the raw value
-            # This handles the case of existing, unencrypted data
+            # Try to decrypt if it looks like base64
+            try:
+                value.encode('ascii')
+                f = self.get_fernet()
+                # If this succeeds, it was encrypted
+                decrypted = f.decrypt(value.encode())
+                return decrypted.decode()
+            except UnicodeEncodeError:
+                # If we can't encode as ASCII, it's probably not encrypted
+                return value
+        except:
+            # If decryption fails, it wasn't encrypted
             return value
 
     def to_python(self, value):
-        if value is None:
-            return value
-        try:
-            f = self.get_fernet()
-            decrypted = f.decrypt(value.encode())
-            return decrypted.decode()
-        except Exception:
-            # If decryption fails, return the raw value
-            return value
+        return value
 
     def get_prep_value(self, value):
         if value is None:
             return value
-        f = self.get_fernet()
+        # Don't encrypt if it's already encrypted
+        try:
+            # Try to decrypt - if it works, it's already encrypted
+            f = self.get_fernet()
+            try:
+                f.decrypt(str(value).encode())
+                return value
+            except:
+                # If decryption fails, encrypt it
+                return f.encrypt(str(value).encode()).decode()
+        except:
+            # If there's any error, encrypt the value
+            f = self.get_fernet()
+            return f.encrypt(str(value).encode()).decode()
         # Only encrypt if the value isn't already encrypted
         try:
             # Try to decrypt - if it works, it's already encrypted

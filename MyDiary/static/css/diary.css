@@ -4,10 +4,17 @@
     gap: 2rem;
     margin: 2rem 2rem 0 2rem;
     padding-bottom: 2rem;
+    min-height: calc(100vh - 150px);
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0;
 }
 
 .sidebar {
     width: 300px;
+    flex-shrink: 0;
     background: rgba(255, 255, 255, 0.95);
     padding: 1.5rem;
     border-radius: 15px;
@@ -16,6 +23,8 @@
     position: sticky;
     top: 2rem;
     transition: all 0.3s ease;
+    overflow-y: auto;
+    max-height: calc(100vh - 100px);
 }
 
 [data-theme="dark"] .sidebar {
@@ -25,10 +34,14 @@
 .entry-card {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     transition: all 0.3s;
+    width: 100%;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 [data-theme="dark"] .entry-card {
