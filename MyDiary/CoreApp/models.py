@@ -16,6 +16,7 @@ class UserProfile(models.Model):
     age = models.PositiveIntegerField(blank=True, null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
+    footer_bg_color = models.CharField(max_length=7, default='#ffffff')
 
     def __str__(self):
         return f"{self.user.username}'s Profile"

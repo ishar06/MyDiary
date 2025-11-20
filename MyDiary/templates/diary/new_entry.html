@@ -44,6 +44,37 @@
         cursor: pointer;
         color: #dc3545;
     }
+    .form-label {
+        font-weight: 500;
+    }
+    .form-label .text-danger {
+        margin-left: 2px;
+        font-weight: bold;
+    }
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+    }
+    .invalid-feedback i {
+        margin-right: 4px;
+    }
+    .is-invalid {
+        border-color: #dc3545;
+    }
+    .is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+    .emoji-grid.border-danger {
+        background-color: rgba(220, 53, 69, 0.05);
+    }
+    .alert ul {
+        padding-left: 20px;
+    }
+    .alert ul li {
+        margin-bottom: 0.25rem;
+    }
 </style>
 {% endblock %}
 
@@ -51,29 +82,54 @@
 <div class="new-entry-container">
     <div class="entry-form-container">
         <h2 class="mb-4">New Diary Entry</h2>
-        <form method="post" class="needs-validation" novalidate enctype="multipart/form-data">
+        
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error!</strong> Please fix the errors below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+        
+        <form method="post" class="needs-validation" novalidate enctype="multipart/form-data" id="diaryEntryForm">
             {% csrf_token %}
             
             <div class="mb-3">
-                <label for="id_title" class="form-label">Title</label>
-                <input type="text" name="title" class="form-control" id="id_title" required>
-                {{ form.title.errors }}
+                <label for="id_title" class="form-label">Title <span class="text-danger">*</span></label>
+                <input type="text" name="title" class="form-control {% if form.title.errors %}is-invalid{% endif %}" id="id_title" required>
+                {% if form.title.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.title.errors %}
+                    <i class="bi bi-exclamation-circle"></i> {{ error }}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="form-text">This field is required</div>
+                {% endif %}
             </div>
 
             <div class="mb-3">
-                <label for="id_category" class="form-label">Category</label>
-                <select name="category" class="form-control" id="id_category" required>
+                <label for="id_category" class="form-label">Category <span class="text-danger">*</span></label>
+                <select name="category" class="form-control {% if form.category.errors %}is-invalid{% endif %}" id="id_category" required>
+                    <option value="">-- Select a category --</option>
                     {% for value, label in form.fields.category.choices %}
                     <option value="{{ value }}">{{ label }}</option>
                     {% endfor %}
                 </select>
-                {{ form.category.errors }}
+                {% if form.category.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.category.errors %}
+                    <i class="bi bi-exclamation-circle"></i> {{ error }}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="form-text">This field is required</div>
+                {% endif %}
             </div>
 
             <div class="mood-selector mb-4">
-                <label class="form-label">How are you feeling?</label>
-                <br><br>
-                <div class="emoji-grid">
+                <label class="form-label">How are you feeling? <span class="text-danger">*</span></label>
+                <div class="form-text mb-2">Select your mood (required)</div>
+                <div class="emoji-grid {% if form.mood.errors %}border border-danger rounded p-2{% endif %}">
                     {% for mood, label in form.fields.mood.choices %}
                     <div class="emoji-option" data-mood="{{ mood }}">
                         <span class="mood-emoji">
@@ -91,7 +147,13 @@
                     {% endfor %}
                 </div>
                 <input type="hidden" name="mood" id="id_mood" required>
-                {{ form.mood.errors }}
+                {% if form.mood.errors %}
+                <div class="invalid-feedback d-block mt-2">
+                    {% for error in form.mood.errors %}
+                    <i class="bi bi-exclamation-circle"></i> {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
 
             <div class="toolbar mb-4">
@@ -120,9 +182,17 @@
             </div>
 
             <div class="mb-3">
-                <label for="id_content" class="form-label">Content</label>
-                <textarea name="content" class="form-control content-area" id="id_content" required></textarea>
-                {{ form.content.errors }}
+                <label for="id_content" class="form-label">Content <span class="text-danger">*</span></label>
+                <textarea name="content" class="form-control content-area {% if form.content.errors %}is-invalid{% endif %}" id="id_content" required></textarea>
+                {% if form.content.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.content.errors %}
+                    <i class="bi bi-exclamation-circle"></i> {{ error }}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="form-text">This field is required</div>
+                {% endif %}
             </div>
 
             <div class="mb-4">
@@ -140,12 +210,16 @@
 
             <input type="hidden" name="text_color" id="id_text_color" value="#000000">
 
+            <div class="alert alert-info mt-3" role="alert">
+                <i class="bi bi-info-circle"></i> Fields marked with <span class="text-danger">*</span> are required
+            </div>
+
             <div class="entry-actions">
                 <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-entry">
                     <i class="bi bi-x-lg"></i>
                     <span>Cancel</span>
                 </a>
-                <button type="submit" class="btn btn-primary btn-entry">
+                <button type="submit" class="btn btn-primary btn-entry" id="submitBtn">
                     <i class="bi bi-check-lg"></i>
                     <span>Save Entry</span>
                 </button>
@@ -171,6 +245,8 @@
         const textColor = document.getElementById('text-color');
         const emojiOptions = document.querySelectorAll('.emoji-option');
         const formContainer = document.querySelector('.entry-form-container');
+        const form = document.getElementById('diaryEntryForm');
+        const submitBtn = document.getElementById('submitBtn');
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const opacity = localStorage.getItem('contentOpacity') || '95';
 
@@ -183,7 +259,87 @@
             option.addEventListener('click', function(e) {
                 e.preventDefault();
                 selectMood(this, this.dataset.mood);
+                // Remove error styling when mood is selected
+                const moodInput = document.getElementById('id_mood');
+                const emojiGrid = document.querySelector('.emoji-grid');
+                if (moodInput.value) {
+                    emojiGrid.classList.remove('border', 'border-danger');
+                }
             });
+        });
+
+        // Form validation on submit
+        form.addEventListener('submit', function(e) {
+            const mood = document.getElementById('id_mood').value;
+            const title = document.getElementById('id_title').value.trim();
+            const content = document.getElementById('id_content').value.trim();
+            const category = document.getElementById('id_category').value;
+            let isValid = true;
+            const errors = [];
+
+            // Clear previous error styling
+            document.querySelectorAll('.form-control, .emoji-grid').forEach(el => {
+                el.classList.remove('is-invalid');
+            });
+            document.querySelectorAll('.emoji-grid').forEach(el => {
+                el.classList.remove('border', 'border-danger');
+            });
+
+            // Validate required fields
+            if (!title) {
+                document.getElementById('id_title').classList.add('is-invalid');
+                errors.push('Title is required');
+                isValid = false;
+            }
+
+            if (!category) {
+                document.getElementById('id_category').classList.add('is-invalid');
+                errors.push('Category selection is required');
+                isValid = false;
+            }
+
+            if (!mood) {
+                document.querySelector('.emoji-grid').classList.add('border', 'border-danger');
+                errors.push('Mood selection is compulsory');
+                isValid = false;
+            }
+
+            if (!content) {
+                document.getElementById('id_content').classList.add('is-invalid');
+                errors.push('Content is required');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Show error alert
+                let errorAlert = document.querySelector('.alert-danger');
+                if (!errorAlert) {
+                    errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert alert-danger alert-dismissible fade show';
+                    errorAlert.role = 'alert';
+                    errorAlert.innerHTML = `
+                        <strong>Error!</strong> Please fix the following errors:
+                        <ul class="mb-0 mt-2">
+                            ${errors.map(err => `<li>${err}</li>`).join('')}
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    form.parentElement.insertBefore(errorAlert, form);
+                } else {
+                    errorAlert.innerHTML = `
+                        <strong>Error!</strong> Please fix the following errors:
+                        <ul class="mb-0 mt-2">
+                            ${errors.map(err => `<li>${err}</li>`).join('')}
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    errorAlert.style.display = 'block';
+                }
+                // Scroll to form
+                form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         });
 
         textColor.addEventListener('change', function() {
